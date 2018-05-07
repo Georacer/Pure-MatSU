@@ -1,0 +1,12 @@
+p_n (north position)
+p_e (east position)
+p_d (down position)
+phi
+theta
+psi
+u
+v
+w
+p
+q
+r
