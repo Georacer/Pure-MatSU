@@ -3,32 +3,69 @@ classdef Vehicle < handle
     %   Detailed explanation goes here
     
     properties
-        mass; % in kg
-        S; % in m^2   
-        vec_pos;
-        vec_euler;
-        vec_vel_linear_body;
-        vec_vel_angular_body;
+        inertial;
+        S; % in m^2
+        state;
+        propulsion;
     end
     
     methods
         
         function obj = Vehicle(model)
             % Constructor
-            obj.mass = model.inertial.mass;
-            obj.S = model.S;
             
-            obj.vec_pos = model.
-            obj.vec_euler = model.
-            obj.vel_linear_body = model.
-            obj.vel_angular_body = model.
+            obj.state = VehicleState();
+            
+            obj.inertial = model.inertial;
+            
+            obj.propulsion = model.propulsion;
+            
+            obj.S = model.S;            
+        end
+        
+        function set_state(obj, vehicle_state)
+           
+            
             
         end
         
-        function R = R_eb()
+        function state = get_state(obj)
+           
+            state = obj.state;
+            
+        end
+        
+        function airdata = get_airdata(obj, environment)
+           
+            % Read wind
+            wind_ned = environment.get_wind_ned(vehicle);
+            % convert to body-frame
+            wind_body = obj.R_eb()*wind_ned;
+            
+            % Calc relative airspeed
+            vel_linear_body = obj.state.get_vec_linear_body();
+            vel_linear_body_relative = vel_linear_body - wind_body;
+            
+            % Calc airspeed
+            airspeed = norm(vel_linear_body_relative);
+            
+            % Calc alpha
+            
+            % Calc beta
+            
+            airdata = [airspeed; alpha; beta];
+            
+        end
+        
+        function R = R_eb(obj)
            % Return rotation matrix from earth frame to body frame
            
            R = zeros(3,3);
+           
+           vec_euler = obj.state.get_vec_euler();
+           Phi = vec_euler(1);
+           Theta = vec_euler(2);
+           Psi = vec_euler(3);           
            
            sinPhi = sin(Phi);
            cosPhi = cos(Phi);
@@ -47,6 +84,12 @@ classdef Vehicle < handle
            R(3,2) = cosPhi * sinTheta * sinPsi - sinPhi * cosPsi;
            R(3,3) = cosPhi * cosTheta;
            
+        end
+        
+        function R = R_be(obj)
+           
+            R = obj.R_eb()';
+            
         end
         
     end

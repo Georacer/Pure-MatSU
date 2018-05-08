@@ -1,4 +1,4 @@
-classdef Gravity
+classdef Gravity < handle
     %GRAVITY Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -9,7 +9,7 @@ classdef Gravity
     methods
         
         function obj = Gravity(sim_options)
-            obj.g_0 = 9.81;
+            obj.g_0 = sim_options.gravity.g_0;
         end
         
         function vec_force_body = get_gravity_force(obj, vehicle)

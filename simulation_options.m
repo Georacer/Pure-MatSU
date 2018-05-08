@@ -4,8 +4,16 @@ function [ sim_options ] = simulation_options( )
 
 sim_options.dt = 0.001;
 
+%% Initialization options
+
+sim_options.init.vec_pos = [0;0;0];
+sim_options.init.vec_euler = [0;0;0];
+sim_options.init.vec_vel_linear_body = [0;0;0];
+sim_options.init.vec_vel_angular_body = [0;0;0];
+
 %% Gravity options
 
+sim_options.gravity.g_0 = 9.81;
 
 %% Environment options
 
@@ -15,6 +23,7 @@ sim_options.environment.rho_0 = 1.225;
 
 %% Wind options
 
+sim_options.environment.wind = [0;0;0]; % North, East, Down, in m/s
 
 end
 
