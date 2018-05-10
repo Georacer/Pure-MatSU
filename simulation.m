@@ -37,13 +37,13 @@ environment.calc_state(vehicle);
 
 % Calculate propulsion
 propulsion.calc_propulsion(vehicle, environment, ctrl_input);
-vec_propulsion_force_body = propulsion.get_propulsion_force_body();
-vec_propulsion_torque_body = propulsion.get_propulsion_torque_body();
+vec_propulsion_force_body = propulsion.get_force_body();
+vec_propulsion_torque_body = propulsion.get_torque_body();
 
 % Calculate aerodynamics
-aerodynamics.calc_aerodynamics(vehicle, environment);
-vec_aerodynamics_force_body = aerodynamics.get_aerodynamics_force_body();
-vec_aerodynamics_torque_body = aerodynamics.get_aerodynamics_torque_body();
+aerodynamics.calc_aerodynamics(vehicle, environment, ctrl_input);
+vec_aerodynamics_force_body = aerodynamics.get_force_body();
+vec_aerodynamics_torque_body = aerodynamics.get_torque_body();
 
 % Calculate derivatives
 vec_force_body = vec_gravity_force_body + vec_propulsion_force_body + vec_aerodynamics_force_body;

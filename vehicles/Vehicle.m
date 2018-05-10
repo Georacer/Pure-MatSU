@@ -4,9 +4,9 @@ classdef Vehicle < handle
     
     properties
         inertial;
-        S; % in m^2
         state;
-        propulsion;
+        propulsion; % propulsion parameters
+        aerodynamics; % aerodynamics parameters
     end
     
     methods
@@ -20,7 +20,7 @@ classdef Vehicle < handle
             
             obj.propulsion = model.propulsion;
             
-            obj.S = model.S;            
+            obj.aerodynamics = model.aerodynamics;
         end
         
         function set_state(obj, vehicle_state)
@@ -47,11 +47,27 @@ classdef Vehicle < handle
             vel_linear_body_relative = vel_linear_body - wind_body;
             
             % Calc airspeed
-            airspeed = norm(vel_linear_body_relative);
+            airspeed = norm(vel_linear_body_relative); % in m/s
+            
+            u_r = vel_linear_body_relative(1);
+            v_r = vel_linear_body_relative(2);
+            w_r = vel_linear_body_relative(3);
             
             % Calc alpha
+            alpha = atan2(w_r,u_r); % in radians
             
             % Calc beta
+            % in radians
+            beta = 0;
+            if (u_r==0)
+                if (v==0)
+                    beta = 0;
+                else
+                    beta = asin(v_r/abs(v_r));
+                end
+            else
+                beta = atan2(v_r,u_r);
+            end
             
             airdata = [airspeed; alpha; beta];
             

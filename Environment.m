@@ -39,7 +39,7 @@ classdef Environment < handle
             
         end
         
-        function rho = get_rho(obj, vehicle_state)
+        function rho = get_rho(obj)
             % Rho accessor
             rho = obj.rho;
         end
