@@ -68,16 +68,40 @@ while (t_0<t_f)
     
     % Calculate derivatives
     vec_force_body = vec_gravity_force_body + vec_propulsion_force_body + vec_aerodynamics_force_body;
-    vec_torque_body = vec_propulsion_torque_body + vec_aerodynamics_torque_body;
+    vec_torque_body = vec_propulsion_torque_body + vec_aerodynamics_torque_body;    
+    kinematics.set_wrench_body(vec_force_body,vec_torque_body);
+    
+    kinematics.set_state(vehicle.state);
+    kinematics.calc_state_derivatives(vehicle);
+    
+    % Debug output
+    vehicle_state = kinematics.get_state();
+    state_derivatives = kinematics.get_state_derivatives();
+    disp('*** DEBUG OUTPUT ***');
+    disp('Position')
+    disp(vehicle.state.get_vec_pos()');
+    disp('Position derivative')
+    disp(state_derivatives.vec_pos_dot');
+    disp('Orientation')
+    disp(vehicle.state.get_vec_euler()');
+    disp('Orientation derivative')
+    disp(state_derivatives.vec_euler_dot');
+    disp('Linear velocity')
+    disp(vehicle.state.get_vec_vel_linear_body()');
+    disp('Linear velocity derivative')
+    disp(state_derivatives.vec_vel_linear_body_dot');
+    disp('Angular velocity')
+    disp(vehicle.state.get_vec_vel_angular_body()');
+    disp('Angular velocity derivative')
+    disp(state_derivatives.vec_vel_angular_body_dot');
+    disp('Airdata')
+    disp(vehicle.get_airdata(environment)');
+    disp('');
     
     % Integrate kinematics
-    kinematics.set_wrench_body(vec_force_body,vec_torque_body);
-    kinematics.calc_state_derivatives(vehicle);
-    state_derivatives = kinematics.get_state_derivatives() % debug output
     kinematics.integrate();
     
     % Update vehicle state
-    vehicle_state_new = kinematics.get_state() % debug output
     kinematics.write_state(vehicle_state_new);
     vehicle.set_state(vehicle_state_new);
     

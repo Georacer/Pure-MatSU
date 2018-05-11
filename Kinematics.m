@@ -51,12 +51,12 @@ classdef Kinematics < handle
             R_be = vehicle.R_be();
             
             % Calculate position derivative
-            vec_vel_linear_body_prev = vehicle.state.get_vec_vel_linear_body();
+            vec_vel_linear_body_prev = obj.state.get_vec_vel_linear_body();
             obj.vec_pos_dot = R_be*vec_vel_linear_body_prev;
             
             % Calculate velocity derivative
-            vec_vel_angular_body_prev = vehicle.state.get_vec_vel_angular_body();
-            vec_euler_prev = vehicle.state.get_vec_euler();
+            vec_vel_angular_body_prev = obj.state.get_vec_vel_angular_body();
+            vec_euler_prev = obj.state.get_vec_euler();
             phi = vec_euler_prev(1);
             theta = vec_euler_prev(2);
             psi = vec_euler_prev(3);
@@ -84,12 +84,18 @@ classdef Kinematics < handle
             
         end
         
-        function integrate(obj)
+        function integrate(obj)            
             
             obj.state.set_vec_pos(obj.state.get_vec_pos() + obj.vec_pos_dot*obj.dt);
-            obj.state.set_vec_euler(obj.state.get_vec_pos() + obj.vec_euler_dot*obj.dt);
+            obj.state.set_vec_euler(obj.state.get_vec_euler() + obj.vec_euler_dot*obj.dt);
             obj.state.set_vec_vel_linear_body(obj.state.get_vec_vel_linear_body() + obj.vec_vel_linear_body_dot*obj.dt);
             obj.state.set_vec_vel_angular_body(obj.state.get_vec_vel_angular_body() + obj.vec_vel_angular_body_dot*obj.dt);
+            
+        end
+        
+        function set_state(obj, external_state)
+            
+            obj.state.set_state(external_state);
             
         end
         
