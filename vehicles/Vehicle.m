@@ -24,8 +24,9 @@ classdef Vehicle < handle
         end
         
         function set_state(obj, vehicle_state)
-           
+            % Copy an external vehicle_state to own member state
             
+            obj.state.set_state(vehicle_state);
             
         end
         
@@ -39,7 +40,7 @@ classdef Vehicle < handle
            
             % Read wind
             wind_ned = environment.get_wind_ned(vehicle);
-            % convert to body-frame
+            % convert from Earth-frame to body-frame
             wind_body = obj.R_eb()*wind_ned;
             
             % Calc relative airspeed
