@@ -14,6 +14,8 @@ classdef Environment < handle
         
         function obj = Environment(sim_options)
             
+            obj.rho_0 = sim_options.environment.rho_0;
+            
             model_type = sim_options.environment.model_type;
             
             if model_type == 1
@@ -47,11 +49,6 @@ classdef Environment < handle
         function wind_ned = get_wind_ned(obj, vehicle)
             
             wind_ned = obj.wind_static;
-            
-        end
-        
-        function state = get_state(obj, vehicle_state)
-            
             
         end
         

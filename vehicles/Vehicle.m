@@ -39,12 +39,12 @@ classdef Vehicle < handle
         function airdata = get_airdata(obj, environment)
            
             % Read wind
-            wind_ned = environment.get_wind_ned(vehicle);
+            wind_ned = environment.get_wind_ned(obj);
             % convert from Earth-frame to body-frame
             wind_body = obj.R_eb()*wind_ned;
             
             % Calc relative airspeed
-            vel_linear_body = obj.state.get_vec_linear_body();
+            vel_linear_body = obj.state.get_vec_vel_linear_body();
             vel_linear_body_relative = vel_linear_body - wind_body;
             
             % Calc airspeed
@@ -59,9 +59,8 @@ classdef Vehicle < handle
             
             % Calc beta
             % in radians
-            beta = 0;
             if (u_r==0)
-                if (v==0)
+                if (v_r==0)
                     beta = 0;
                 else
                     beta = asin(v_r/abs(v_r));

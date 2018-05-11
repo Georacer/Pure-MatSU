@@ -34,7 +34,9 @@ classdef Aerodynamics < handle
             b = vehicle.aerodynamics.b;
             c = vehicle.aerodynamics.c;
             c_drag_deltae = vehicle.aerodynamics.c_drag_deltae;
-            c_lift_deltae = vehicle.aerodynamics.c_lift_deltae;      
+            c_drag_q = vehicle.aerodynamics.c_drag_q;
+            c_lift_deltae = vehicle.aerodynamics.c_lift_deltae;  
+            c_lift_q = vehicle.aerodynamics.c_lift_q;
             c_y_0 = vehicle.aerodynamics.c_y_0;
             c_y_b = vehicle.aerodynamics.c_y_b;
             c_y_r = vehicle.aerodynamics.c_y_r;
@@ -93,9 +95,9 @@ classdef Aerodynamics < handle
             if (airspeed==0)
                 obj.vec_force_body = zeros(3,1);
             else
-                obj.vec_force_body(1) = q_bar*(c_x_a + c_x_q*c*q/(2*airspeed) - c_drag_deltae*cos(alpha)*fabs(elevator) + c_lift_deltae*sin(alpha)*elevator);
+                obj.vec_force_body(1) = q_bar*(c_x_a + c_x_q*c*q/(2*airspeed) - c_drag_deltae*cos(alpha)*abs(elevator) + c_lift_deltae*sin(alpha)*elevator);
                 obj.vec_force_body(2) = q_bar*(c_y_0 + c_y_b*beta + c_y_p*b*p/(2*airspeed) + c_y_r*b*r/(2*airspeed) + c_y_deltaa*aileron + c_y_deltar*rudder);
-                obj.vec_force_body(3) = q_bar*(c_z_a + c_z_q*c*q/(2*airspeed) - c_drag_deltae*sin(alpha)*fabs(elevator) - c_lift_deltae*cos(alpha)*elevator);
+                obj.vec_force_body(3) = q_bar*(c_z_a + c_z_q*c*q/(2*airspeed) - c_drag_deltae*sin(alpha)*abs(elevator) - c_lift_deltae*cos(alpha)*elevator);
             end
             
             % Calculate torque
@@ -118,7 +120,7 @@ classdef Aerodynamics < handle
                 c_lift_0 = vehicle.aerodynamics.c_lift_0;
                 c_lift_a0 = vehicle.aerodynamics.c_lift_a;
                 
-                sigmoid = (1 + exp(-M*(alpha-alpha_0)) + exp(M*(alpha+alpha_0)) ) / (1 + exp(-M(alpha-alpha_0))) / (1 + exp(M*alpha+alpha_0));
+                sigmoid = (1 + exp(-M*(alpha-alpha_0)) + exp(M*(alpha+alpha_0)) ) / (1 + exp(-M*(alpha-alpha_0))) / (1 + exp(M*alpha+alpha_0));
                 linear = (1 - sigmoid)*(c_lift_0 + c_lift_a0*alpha); % Lift at small AoA
                 flat_plate = sigmoid*(2*sign(alpha)*(sin(alpha))^2*cos(alpha)); % Lift beyond stall
                 

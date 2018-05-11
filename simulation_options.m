@@ -8,8 +8,12 @@ sim_options.dt = 0.001;
 
 sim_options.init.vec_pos = [0;0;0];
 sim_options.init.vec_euler = [0;0;0];
-sim_options.init.vec_vel_linear_body = [0;0;0];
+sim_options.init.vec_vel_linear_body = [10;0;0];
 sim_options.init.vec_vel_angular_body = [0;0;0];
+
+%% Visualization options
+
+sim_options.visualization.draw = true;
 
 %% Gravity options
 

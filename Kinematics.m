@@ -35,15 +35,15 @@ classdef Kinematics < handle
             
         end
         
-        function calc_state_derivaties(obj, vehicle)
+        function calc_state_derivatives(obj, vehicle)
             
             % Setup the matrix of inertia
             J = zeros(3,3);
-            J(1,1) = vehicle.inertia.j_x;
-            J(2,2) = vehicle.inertia.j_y;
-            J(3,3) = vehicle.inertia.j_z;
-            J(1,3) = -vehicle.inertia.j_xz;
-            J(3,1) = -vehicle.inertia.j_xz;
+            J(1,1) = vehicle.inertial.j_x;
+            J(2,2) = vehicle.inertial.j_y;
+            J(3,3) = vehicle.inertial.j_z;
+            J(1,3) = -vehicle.inertial.j_xz;
+            J(3,1) = -vehicle.inertial.j_xz;
             % Calcualte its inverse
             J_i = J^(-1);
             
@@ -66,12 +66,12 @@ classdef Kinematics < handle
             obj.vec_euler_dot = E*vec_vel_angular_body_prev;
             
             % Calculate linear velocity derivatives
-            linear_acc = obj.vec_force_body/vehicle.inertial.m;
+            linear_acc = obj.vec_force_body/vehicle.inertial.mass;
             corriolis_acc = -cross(vec_vel_angular_body_prev, vec_vel_linear_body_prev);
             obj.vec_vel_linear_body_dot = linear_acc + corriolis_acc;
             
             % Calculate angular velocity derivatives
-            obj.vec_vel_angular_body_dot = J_i*(obj.vec_torque_body - vec_vel_angular_body_prev*(J*vec_vel_angular_body_prev));
+            obj.vec_vel_angular_body_dot = J_i*(obj.vec_torque_body - cross(vec_vel_angular_body_prev, (J*vec_vel_angular_body_prev)));
             
         end
         
@@ -107,7 +107,9 @@ classdef Kinematics < handle
             external_state.set_vec_pos(obj.state.get_vec_pos());
             external_state.set_vec_euler(obj.state.get_vec_euler());
             external_state.set_vec_vel_linear_body(obj.state.get_vec_vel_linear_body());
-            external_state.set_vec_vel_angular_body(obj.state.get_vec_vel_angular_body());            
+            external_state.set_vec_vel_angular_body(obj.state.get_vec_vel_angular_body());   
+            
+        end
         
     end
     
