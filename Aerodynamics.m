@@ -104,7 +104,7 @@ classdef Aerodynamics < handle
             % Calculate torque
             
             if (airspeed==0)
-                obj.vec_force_body = zeros(3,1);
+                obj.vec_torque_body = zeros(3,1);
             else
                 obj.vec_torque_body(1) = q_bar*b*(c_l_0 + c_l_b*beta + c_l_p*b*p/(2*airspeed) + c_l_r*b*r/(2*airspeed) + c_l_deltaa*aileron + c_l_deltar*rudder);
                 obj.vec_torque_body(2) = q_bar*c*(c_m_0 + c_m_a*alpha + c_m_q*c*q/(2*airspeed) + c_m_deltae*elevator);
@@ -121,7 +121,7 @@ classdef Aerodynamics < handle
                 c_lift_0 = vehicle.aerodynamics.c_lift_0;
                 c_lift_a0 = vehicle.aerodynamics.c_lift_a;
                 
-                sigmoid = (1 + exp(-M*(alpha-alpha_0)) + exp(M*(alpha+alpha_0)) ) / (1 + exp(-M*(alpha-alpha_0))) / (1 + exp(M*alpha+alpha_0));
+                sigmoid = (1 + exp(-M*(alpha-alpha_0)) + exp(M*(alpha+alpha_0)) ) / (1 + exp(-M*(alpha-alpha_0))) / (1 + exp(M*(alpha+alpha_0)));
                 linear = (1 - sigmoid)*(c_lift_0 + c_lift_a0*alpha); % Lift at small AoA
                 flat_plate = sigmoid*(2*sign(alpha)*(sin(alpha))^2*cos(alpha)); % Lift beyond stall
                 

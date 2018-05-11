@@ -45,7 +45,7 @@ dt = sim_options.dt;
 t = t_0;
 
 % for each loop:
-while (t_0<t_f)
+while (t<t_f)
     
     ctrl_input = zeros(4,1);
     
@@ -74,29 +74,29 @@ while (t_0<t_f)
     kinematics.set_state(vehicle.state);
     kinematics.calc_state_derivatives(vehicle);
     
-    % Debug output
-    vehicle_state = kinematics.get_state();
-    state_derivatives = kinematics.get_state_derivatives();
-    disp('*** DEBUG OUTPUT ***');
-    disp('Position')
-    disp(vehicle.state.get_vec_pos()');
-    disp('Position derivative')
-    disp(state_derivatives.vec_pos_dot');
-    disp('Orientation')
-    disp(vehicle.state.get_vec_euler()');
-    disp('Orientation derivative')
-    disp(state_derivatives.vec_euler_dot');
-    disp('Linear velocity')
-    disp(vehicle.state.get_vec_vel_linear_body()');
-    disp('Linear velocity derivative')
-    disp(state_derivatives.vec_vel_linear_body_dot');
-    disp('Angular velocity')
-    disp(vehicle.state.get_vec_vel_angular_body()');
-    disp('Angular velocity derivative')
-    disp(state_derivatives.vec_vel_angular_body_dot');
-    disp('Airdata')
-    disp(vehicle.get_airdata(environment)');
-    disp('');
+%     % Debug output
+%     vehicle_state = kinematics.get_state();
+%     state_derivatives = kinematics.get_state_derivatives();
+%     fprintf('*** DEBUG OUTPUT @ t=%f***\n',t);
+%     disp('Position')
+%     disp(vehicle.state.get_vec_pos()');
+%     disp('Position derivative')
+%     disp(state_derivatives.vec_pos_dot');
+%     disp('Orientation')
+%     disp(vehicle.state.get_vec_euler()');
+%     disp('Orientation derivative')
+%     disp(state_derivatives.vec_euler_dot');
+%     disp('Linear velocity')
+%     disp(vehicle.state.get_vec_vel_linear_body()');
+%     disp('Linear velocity derivative')
+%     disp(state_derivatives.vec_vel_linear_body_dot');
+%     disp('Angular velocity')
+%     disp(vehicle.state.get_vec_vel_angular_body()');
+%     disp('Angular velocity derivative')
+%     disp(state_derivatives.vec_vel_angular_body_dot');
+%     disp('Airdata')
+%     disp(vehicle.get_airdata(environment)');
+%     disp('');
     
     % Integrate kinematics
     kinematics.integrate();

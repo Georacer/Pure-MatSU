@@ -74,6 +74,9 @@ function plot_states(vehicle, t, initialize)
     persistent phi_handle
     persistent theta_handle
     persistent psi_handle
+    persistent u_handle
+    persistent v_handle
+    persistent w_handle
     persistent p_handle
     persistent q_handle
     persistent r_handle
@@ -85,7 +88,7 @@ function plot_states(vehicle, t, initialize)
 
   % first time function is called, initialize plot and persistent vars
     if initialize
-        num_lines = 5;
+        num_lines = 6;
         figure(), clf
 
         subplot(num_lines,2,1)
@@ -128,11 +131,21 @@ function plot_states(vehicle, t, initialize)
         
         subplot(num_lines,2,7)
         hold on
-        p_handle = graph_y(t, p, [], 'p', 'b');        
+        u_handle = graph_y(t, u, [], 'u', 'b');        
         subplot(num_lines,2,8)
         hold on
-        q_handle = graph_y(t, q, [], 'q', 'b');        
+        v_handle = graph_y(t, v, [], 'v', 'b');        
         subplot(num_lines,2,9)
+        hold on
+        w_handle = graph_y(t, w, [], 'w', 'b');
+        
+        subplot(num_lines,2,10)
+        hold on
+        p_handle = graph_y(t, p, [], 'p', 'b');        
+        subplot(num_lines,2,11)
+        hold on
+        q_handle = graph_y(t, q, [], 'q', 'b');        
+        subplot(num_lines,2,12)
         hold on
         r_handle = graph_y(t, r, [], 'r', 'b');
         
@@ -167,6 +180,9 @@ function plot_states(vehicle, t, initialize)
        graph_y(t, phi, phi_handle);
        graph_y(t, theta, theta_handle);
        graph_y(t, psi, psi_handle);
+       graph_y(t, u, u_handle);
+       graph_y(t, v, v_handle);
+       graph_y(t, w, w_handle);
        graph_y(t, p, p_handle);
        graph_y(t, q, q_handle);
        graph_y(t, r, r_handle);
