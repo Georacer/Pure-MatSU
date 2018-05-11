@@ -27,8 +27,14 @@ kinematics = Kinematics(sim_options);
 vehicle_state_new = VehicleState(); % Use a swap variable to update vehicle state
 
 % initialize visualization
-if sim_options.visualization.draw
+if sim_options.visualization.draw_graphics
     draw_aircraft(vehicle, graphic, true);    
+end
+if sim_options.visualization.draw_forces
+    plot_forces(gravity, propulsion, aerodynamics, 0, true);    
+end
+if sim_options.visualization.draw_states
+    plot_states(vehicle, 0, true);    
 end
 
 %% Begin simulation
@@ -44,7 +50,8 @@ while (t_0<t_f)
     ctrl_input = zeros(4,1);
     
     % Calculate gravity
-    vec_gravity_force_body = gravity.get_gravity_force(vehicle);
+    gravity.calc_gravity(vehicle);
+    vec_gravity_force_body = gravity.get_force_body();
     
     % Calculate environment stuff
     environment.calc_state(vehicle);
@@ -66,17 +73,23 @@ while (t_0<t_f)
     % Integrate kinematics
     kinematics.set_wrench_body(vec_force_body,vec_torque_body);
     kinematics.calc_state_derivatives(vehicle);
-    % state_derivatives = kinematics.get_state_derivatives();
+    state_derivatives = kinematics.get_state_derivatives() % debug output
     kinematics.integrate();
     
     % Update vehicle state
-    % vehicle_state_new = kinematics.get_state();
+    vehicle_state_new = kinematics.get_state() % debug output
     kinematics.write_state(vehicle_state_new);
     vehicle.set_state(vehicle_state_new);
     
     % Update visual output
-    if sim_options.visualization.draw
+    if sim_options.visualization.draw_graphics
         draw_aircraft(vehicle, graphic, false);
+    end
+    if sim_options.visualization.draw_forces
+        plot_forces(gravity, propulsion, aerodynamics, t, false);
+    end
+    if sim_options.visualization.draw_states
+        plot_states(vehicle, t, false);
     end
     
     t = t + dt;

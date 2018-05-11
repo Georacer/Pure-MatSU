@@ -13,7 +13,9 @@ sim_options.init.vec_vel_angular_body = [0;0;0];
 
 %% Visualization options
 
-sim_options.visualization.draw = true;
+sim_options.visualization.draw_graphics = true;
+sim_options.visualization.draw_forces = true;
+sim_options.visualization.draw_states = true;
 
 %% Gravity options
 

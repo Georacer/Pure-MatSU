@@ -39,6 +39,7 @@ classdef Aerodynamics < handle
             c_lift_q = vehicle.aerodynamics.c_lift_q;
             c_y_0 = vehicle.aerodynamics.c_y_0;
             c_y_b = vehicle.aerodynamics.c_y_b;
+            c_y_p = vehicle.aerodynamics.c_y_p;
             c_y_r = vehicle.aerodynamics.c_y_r;
             c_y_deltaa = vehicle.aerodynamics.c_y_deltaa;
             c_y_deltar = vehicle.aerodynamics.c_y_deltar;
