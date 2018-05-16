@@ -1,17 +1,33 @@
 classdef Aerodynamics < handle
-    %AERODYNAMICS Summary of this class goes here
-    %   Detailed explanation goes here
+% AERODYNAMICS Class containing all aerodynamics calculations
+%
+% Other m-files required: Vehicle, Environment
+% MAT-files required: none
+%
+% See also: Vehicle, Environment
+
+% Created at 2018/05/10 by George Zogopoulos-Papaliakos
+% Last edit at 2018/05/16 by George Zogopoulos-Papaliakos
     
     properties
-        vec_force_body;
-        vec_torque_body;
+        vec_force_body; % body-frame aerodynamic force, in SI units
+        vec_torque_body; % body-frame aerodynamic torque, in SI units
         
-        aerodynamics_mdl_fh;
+        aerodynamics_mdl_fh; % function handle to aerodynamic model
     end
     
     methods
         
         function obj = Aerodynamics(vehicle)
+            % AERODYNAMICS Class constructor
+            %
+            % Syntax:  [obj] = Aerodynamics(vehicle)
+            %
+            % Inputs:
+            %    vehicle - A Vehicle instance
+            %
+            % Outputs:
+            %    obj - Class instance
            
             obj.vec_force_body = zeros(3,1);
             obj.vec_torque_body = zeros(3,1);
@@ -21,13 +37,26 @@ classdef Aerodynamics < handle
             if model_type == 1
                 obj.aerodynamics_mdl_fh = @obj.aerodynamics_mdl_1;
             else
-                error("unknown model type");
+                error('unknown model type');
             end
             
         end
         
         function aerodynamics_mdl_1(obj, vehicle, environment, ctrl_input)
-            % Standard model linear in the parameters
+            % AERODYNAMICS_MDL_1 Classic aerodynamics model, linear in the parameters
+            %
+            % Syntax:  [] = aerodynamics_mdl_1(vehicle, environment, ctrl_input)
+            %
+            % Inputs:
+            %    vehicle - A Vehicle instance
+            %    environment - An Environment instance
+            %    ctrl_input - A 4x1 array comprised of aileron input [-1,1], elevator input [-1,1], throttle input [0,1]
+            %    and rudder input [-1,1]
+            %
+            % Outputs:
+            %    (none)
+            %
+            % Subfunctions: lift_coeff, drag_coeff
             
             % Read parameters
             s = vehicle.aerodynamics.s;
@@ -113,8 +142,17 @@ classdef Aerodynamics < handle
             
            
             function cL_a = lift_coeff(vehicle, alpha)
-                % Caclulate lift coefficient
-                
+                % LIFT_COEFF Calculate AoA lift coefficient component, in stability frame
+                %
+                % Syntax:  [cL_a] = lift_coeff(vehicle, alpha)
+                %
+                % Inputs:
+                %    vehicle - A Vehicle instance
+                %    alpha - Angle-of-attack, in SI units
+                %
+                % Outputs:
+                %    cL_a - Coefficient of lift, dimensionless
+
                 % Read parameters
                 M = vehicle.aerodynamics.mcoeff;
                 alpha_0 = vehicle.aerodynamics.alpha_stall;
@@ -130,7 +168,16 @@ classdef Aerodynamics < handle
             end
             
             function cD_a = drag_coeff(vehicle, alpha)
-                % Calculate drag coefficient
+                % DRAG_COEFF Calculate AoA drag coefficient component, in stability frame
+                %
+                % Syntax:  [cD_a] = drag_coeff(vehicle, alpha)
+                %
+                % Inputs:
+                %    vehicle - A Vehicle instance
+                %    alpha - Angle-of-attack, in SI units
+                %
+                % Outputs:
+                %    cL_a - Coefficient of drag, dimensionless
                 
                 % Read parameters
                 b1 = vehicle.aerodynamics.b;
@@ -149,17 +196,47 @@ classdef Aerodynamics < handle
         end
         
         function calc_aerodynamics(obj, vehicle, environment, ctrl_input)
+            % CALC_AERODYNAMICS Perform the aerodynamics calculation
+            %
+            % Syntax:  [] = calc_aerodynamics(vehicle, environment, ctrl_input)
+            %
+            % Inputs:
+            %    vehicle - A Vehicle instance
+            %    environment - An Environment instance
+            %    ctrl_input - A 4x1 array comprised of aileron input [-1,1], elevator input [-1,1], throttle input [0,1]
+            %    and rudder input [-1,1]
+            %
+            % Outputs:
+            %    (none)
             
             obj.aerodynamics_mdl_fh(vehicle, environment, ctrl_input);
             
         end
         
         function vec_force_body = get_force_body(obj)
+            % GET_FORCE_BODY Accessor for the aerodynamic force
+            %
+            % Syntax:  [vec_force_body] = get_force_body()
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    vec_force_body - a 3x1 vector containing the aerodynamic force in body-frame (in SI units)
             
             vec_force_body = obj.vec_force_body;
         end
         
         function vec_torque_body = get_torque_body(obj)
+            % GET_FORCE_BODY Accessor for the aerodynamic torque
+            %
+            % Syntax:  [vec_force_body] = get_torque_body()
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    vec_torque_body - a 3x1 vector containing the aerodynamic torque in body-frame (in SI units)
             
             vec_torque_body = obj.vec_torque_body;
         end

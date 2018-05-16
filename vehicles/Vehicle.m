@@ -1,10 +1,18 @@
 classdef Vehicle < handle
-    %VEHICLE Summary of this class goes here
-    %   Detailed explanation goes here
+% VEHICLE General vehicle class
+% Aggregates submodels and provides common functionality
+%
+% Other m-files required: VehicleState, Propulsion, Aerodynamics, Environment
+% MAT-files required: none
+%
+% See also: VehicleState, Propulsion, Aerodynamics
+
+% Created at 2018/05/10 by George Zogopoulos-Papaliakos
+% Last edit at 2018/05/16 by George Zogopoulos-Papaliakos
     
     properties
-        inertial;
-        state;
+        inertial; % inertial parameters
+        state; % pointer to VehicleState
         propulsion; % propulsion parameters
         aerodynamics; % aerodynamics parameters
     end
@@ -12,7 +20,15 @@ classdef Vehicle < handle
     methods
         
         function obj = Vehicle(model)
-            % Constructor
+            % VEHICLE Class constructor
+            %
+            % Syntax:  [obj] = Vehicle(model)
+            %
+            % Inputs:
+            %    model - Struct defining model parameters, chosen from the vehicles directory
+            %
+            % Outputs:
+            %    obj - Class instance
             
             obj.state = VehicleState();
             
@@ -24,20 +40,47 @@ classdef Vehicle < handle
         end
         
         function set_state(obj, vehicle_state)
-            % Copy an external vehicle_state to own member state
+            % SET_STATE Copy an external vehicle_state to own member state
+            %
+            % Syntax:  [] = set_state(vehicle_state)
+            %
+            % Inputs:
+            %    vehicle_state - VehicleState object
+            %
+            % Outputs:
+            %    (none)
             
             obj.state.set_state(vehicle_state);
             
         end
         
         function state = get_state(obj)
-           
+            % GET_STATE - Accessor for the state member
+            %
+            % Syntax:  [state] = get_state()
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    state - The internal VehicleState object
+            
             state = obj.state;
             
         end
         
         function airdata = get_airdata(obj, environment)
-           
+            % GET_AIRDATA - Calculate the air data triplet (airspeed, AoA, AoS)
+            % Requires an external Environment object to consult the wind model
+            %
+            % Syntax:  [airdata] = get_airdata(environment)
+            %
+            % Inputs:
+            %    environment - An Environment instance
+            %
+            % Outputs:
+            %    airdata - A 3x1 array containing airspeed, angle-of-attack and angle-of-sideslip (all in SI units)
+            
             % Read wind
             wind_ned = environment.get_wind_ned(obj);
             % convert from Earth-frame to body-frame
@@ -74,8 +117,17 @@ classdef Vehicle < handle
         end
         
         function R = R_eb(obj)
-           % Return rotation matrix from earth frame to body frame
-           
+            % R_EB Return the Earth-frame to Body-frame rotation matrix
+            % Uses the internal state to calculate it
+            %
+            % Syntax:  [R] = R_eb( )
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    R - The rotation matrix
+            
            R = zeros(3,3);
            
            vec_euler = obj.state.get_vec_euler();
@@ -103,6 +155,15 @@ classdef Vehicle < handle
         end
         
         function R = R_be(obj)
+            % R_BE Return the Body-frame to Earth-frame rotation matrix
+            %
+            % Syntax:  [R] = R_be()
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    R - The rotation matrix
            
             R = obj.R_eb()';
             

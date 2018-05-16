@@ -1,6 +1,7 @@
 function [ parameters ] = skywalker_2013( )
-%SKYWALKER Summary of this function goes here
-%   Detailed explanation goes here
+% SKYWALKER_2013 Parameter struct generator for a 2013 Skywalker small, fixed-wing UAV model
+% Consult https://github.com/Georacer/uav-modeling/blob/master/preamble.pdf and 
+% http://georacer.github.io/last_letter/parameters/aircraftParams.html for more information on individual parameters
 
 %% Inertial characteristics
 parameters.inertial.mass = 2.0; % in kg
@@ -64,6 +65,10 @@ parameters.propulsion.k_motor = 17.9;
 parameters.propulsion.k_t_p = 0.00002;
 parameters.propulsion.k_omega = 254;
 parameters.propulsion.c_prop = 1.0;
+
+%% Vehicle graphic
+
+parameters.graphic = "airplane_1";
 
 end
 

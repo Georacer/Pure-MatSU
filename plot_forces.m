@@ -1,6 +1,6 @@
 function plot_forces(gravity, propulsion, aerodynamics, t, initialize)
-%
-% modified 12/11/2009 - RB
+% PLOT_FORCES Used to generate a live plot of the forces exerted on the vehicle
+% Based on the accompanying exercises from Beard and McLain's "Small Unmanned Aircraft"
 
     % define persistent variables 
     persistent gx_handle
@@ -115,7 +115,7 @@ function handle = graphForce(t, f, lab, handle)
   else
     set(handle,'Xdata',[get(handle,'Xdata'),t]);
     set(handle,'Ydata',[get(handle,'Ydata'),f]);
-    %drawnow
+    drawnow
   end
 
 %

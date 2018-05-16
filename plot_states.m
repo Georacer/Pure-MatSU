@@ -1,6 +1,6 @@
 function plot_states(vehicle, t, initialize)
-%
-% modified 12/11/2009 - RB
+% PLOT_FORCES Used to generate a live plot of the vehicle states
+% Based on the accompanying exercises from Beard and McLain's "Small Unmanned Aircraft"
 
     % process inputs to function
     vec_pos = vehicle.state.get_vec_pos();
@@ -242,7 +242,7 @@ function handle = graph_y_yhat_yd(t, y, yhat, yd, lab, handle)
     set(handle(2),'Ydata',[get(handle(2),'Ydata'),yhat]);
     set(handle(3),'Xdata',[get(handle(3),'Xdata'),t]);
     set(handle(3),'Ydata',[get(handle(3),'Ydata'),yd]);     
-    %drawnow
+    drawnow
   end
 
 %
