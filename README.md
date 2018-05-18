@@ -24,7 +24,7 @@ Follow these instructions to use this simulator:
 
    Specifically the `skywalker_2013` is modeled like the corresponding model from [last_letter](http://georacer.github.io/last_letter/parameters/aircraftParams.html) and more modeling information can be found in the [uav-modeling](https://github.com/Georacer/uav-modeling/blob/master/preamble.pdf) documenation.
 
- - **Run simulation**: Run the `simulation` script. The vehicle states trajectory is saved in the `array_states` variable. The input history is saved in the `array_inputs` variable.
+ - **Run simulation**: Run the `simulation` script to generate the simulation output in the `sim_output` workspace struct variable. The vehicle states trajectory is saved in the `array_states` member. The input history is saved in the `array_inputs` member.
 
 ## Writing a new controller
 
