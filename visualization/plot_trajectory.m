@@ -2,6 +2,10 @@ function [] = plot_trajectory(sim_output, sim_options, varargin)
 % PLOT_TRAJECTORY Batch-plot the simulated trajectory output
 % Generate a 3D plot of the position trajectory of the vehicle. Can be used after the end of the simulation.
 %
+% Syntax:  [] = plot_trajectory(sim_output, sim_options)
+%          [] = plot_trajectory(sim_output, sim_options, 'plot_vehicle', true)
+%          [] = plot_trajectory(sim_output, sim_options, 'plot_vehicle', true, 'num_graphics', 20)
+%
 % Inputs:
 %    sim_output - Struct output from the simulation script
 %    sim_options - Struct output from the simulation_options function
@@ -25,11 +29,6 @@ parser = inputParser;
 parser.addParameter('plot_vehicle',false,@islogical); % Draw the 3D model of the vehicle
 parser.addParameter('num_graphics',10,@isPositiveIntegerValuedNumeric); % How many 3D models of the vehicle will be plotted
 parser.parse(varargin{:});
-
-% define persistent variables
-persistent spacecraft_handle;
-persistent axes_handle;
-persistent frame_counter;
 
 % process inputs to function
 states = sim_output.array_states;
