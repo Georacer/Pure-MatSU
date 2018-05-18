@@ -58,6 +58,7 @@ t_0 = sim_options.t_0;
 t_f = sim_options.t_f;
 dt = sim_options.dt;
 t = t_0;
+frame_skip = 100;
 
 % Generate the controller object
 controller = Controller(sim_options);
@@ -87,6 +88,7 @@ end
 
 fprintf("Starting simulation...\n");
 
+wb_h = waitbar(0, 'Simulation running...');
 
 % Main loop:
 frame_num = 1;
@@ -128,6 +130,11 @@ while (t<t_f)
     kinematics.write_state(vehicle_state_new);
     vehicle.set_state(vehicle_state_new);
     
+    % Update waitbar
+    if mod(frame_num, frame_skip)==0
+        waitbar(frame_num/num_frames, wb_h);
+    end
+    
     if sim_options.record_states
         array_states(:,frame_num) = vehicle.state.serialize();
     end
@@ -152,6 +159,9 @@ while (t<t_f)
 end
 wall_time = toc;
 
+% Close waitbar
+close(wb_h);
+
 sim_output.array_inputs = array_inputs;
 sim_output.array_states = array_states;
 
@@ -166,6 +176,6 @@ if sim_options.delete_temp_vars
     clear vehicle aerodynamics gravity propulsion kinematics environment controller;
     clear array_inputs array_states vehicle_state_new temp_state ctrl_input
     clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
-    clear dt wall_time t t_0 t_f num_frames frame_num
+    clear dt wall_time t t_0 t_f num_frames frame_num frame_skip wb_h
     clear model graphic model_name graphic_name
 end
