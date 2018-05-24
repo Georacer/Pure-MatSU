@@ -7,6 +7,8 @@ This simulator is written in pure Matlab, i.e. does not make use of Simulink.
 
 It is a free-running simulation, meaning that it will execute as fast as it can, according to the capabilities of your system. It is not locked to a real-time clock.
 
+Please use the version releases to ensure that your downloaded version is as bug-free as possible and has updated documentation.
+
 ## User Instructions
 
 Follow these instructions to use this simulator:
@@ -25,6 +27,8 @@ Follow these instructions to use this simulator:
    Specifically the `skywalker_2013` is modeled like the corresponding model from [last_letter](http://georacer.github.io/last_letter/parameters/aircraftParams.html) and more modeling information can be found in the [uav-modeling](https://github.com/Georacer/uav-modeling/blob/master/preamble.pdf) documenation.
 
  - **Run simulation**: Run the `simulation` script to generate the simulation output in the `sim_output` workspace struct variable. The vehicle states trajectory is saved in the `array_states` member. The input history is saved in the `array_inputs` member.
+
+ - **Plot resulting trajectory**: Run `plot_trajectory(sim_output, sim_options)` to plot the resulting trajectory. Read the function documentation for more graphics options.
 
 ## Writing a new controller
 

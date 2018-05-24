@@ -3,8 +3,9 @@
 % return handle if 3rd argument is empty, otherwise use 3rd arg as handle
 %=======================================================================
 %
-function plot_handle = draw_aircraft_body(vehicle, graphic, plot_handle)
+function plot_handle = draw_aircraft_body(vehicle, plot_handle)
 
+  graphic = vehicle.graphic;
   V_body = graphic.V;
   F = graphic.F;
   patch_colors = graphic.patch_colors;

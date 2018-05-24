@@ -1,8 +1,5 @@
-function draw_aircraft(vehicle, graphic, initialize, varargin)
+function draw_aircraft(vehicle, initialize, varargin)
 %Function to create the visualisation of the aircraft
-%V is a vector of the model vertices
-%F is a vector of the model edges
-%patchcolors is a vector of the surface colors
 
     parser = inputParser;
     parser.addParameter('figure_handle', []);
@@ -50,7 +47,7 @@ function draw_aircraft(vehicle, graphic, initialize, varargin)
         else
             zoom = 2;
         end
-        aircraft_handle = draw_aircraft_body(vehicle, graphic, []);
+        aircraft_handle = draw_aircraft_body(vehicle, []);
         title('Spacecraft')
         xlabel('East')
         ylabel('North')
@@ -73,7 +70,7 @@ function draw_aircraft(vehicle, graphic, initialize, varargin)
         
     % at every other time step, redraw base and rod
     else 
-        draw_aircraft_body(vehicle, graphic, aircraft_handle);
+        draw_aircraft_body(vehicle, aircraft_handle);
         if follow
             set(axes_handle,'XLim',[-zoom+pe zoom+pe],'YLim',[-zoom+pn zoom+pn],'ZLim',[-zoom+pz zoom+pz]);
         else

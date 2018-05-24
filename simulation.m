@@ -36,13 +36,9 @@ sim_options = simulation_options();
 
 % Select model
 model_name = sim_options.vehicle;
-eval(sprintf("model = %s();", model_name));
-% Set graphic
-graphic_name = model.graphic;
-eval(sprintf("graphic = %s();", graphic_name));
 
 % Instantiate vehicle
-vehicle = Vehicle(model);
+vehicle = Vehicle(model_name);
 vehicle.state.initialize(sim_options);
 
 % Generate the rest of the simulation components
@@ -75,7 +71,7 @@ end
 
 % Initialize visualization
 if sim_options.visualization.draw_graphics
-    draw_aircraft(vehicle, graphic, true);    
+    draw_aircraft(vehicle, true);    
 end
 if sim_options.visualization.draw_forces
     plot_forces(gravity, propulsion, aerodynamics, 0, true);    
@@ -144,7 +140,7 @@ while (t<t_f)
     
     % Update visual output
     if sim_options.visualization.draw_graphics
-        draw_aircraft(vehicle, graphic, false);
+        draw_aircraft(vehicle, false);
     end
     if sim_options.visualization.draw_forces
         plot_forces(gravity, propulsion, aerodynamics, t, false);
@@ -162,8 +158,10 @@ wall_time = toc;
 % Close waitbar
 close(wb_h);
 
+% Store simulation results to output struct
 sim_output.array_inputs = array_inputs;
 sim_output.array_states = array_states;
+
 
 fprintf("Simulation ended\n\n");
 
@@ -177,5 +175,5 @@ if sim_options.delete_temp_vars
     clear array_inputs array_states vehicle_state_new temp_state ctrl_input
     clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
     clear dt wall_time t t_0 t_f num_frames frame_num frame_skip wb_h
-    clear model graphic model_name graphic_name
+    clear model_name
 end

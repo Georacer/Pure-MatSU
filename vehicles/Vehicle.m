@@ -15,20 +15,25 @@ classdef Vehicle < handle
         state; % pointer to VehicleState
         propulsion; % propulsion parameters
         aerodynamics; % aerodynamics parameters
+        graphic; % Graphic representation of the vehicle, for drawing
     end
     
     methods
         
-        function obj = Vehicle(model)
+        function obj = Vehicle(model_name)
             % VEHICLE Class constructor
             %
             % Syntax:  [obj] = Vehicle(model)
             %
             % Inputs:
-            %    model - Struct defining model parameters, chosen from the vehicles directory
+            %    model_name - Name of model. Must be the name of a model function in the vehicles folder e.g.
+            %    "skywalker_2013".
             %
             % Outputs:
             %    obj - Class instance
+            
+            
+            eval(sprintf("model = %s();", model_name));
             
             obj.state = VehicleState();
             
@@ -37,6 +42,11 @@ classdef Vehicle < handle
             obj.propulsion = model.propulsion;
             
             obj.aerodynamics = model.aerodynamics;
+            
+            % Set graphic
+            graphic_name = model.graphic;
+            eval(sprintf("obj.graphic = %s();", graphic_name));
+            
         end
         
         function set_state(obj, vehicle_state)

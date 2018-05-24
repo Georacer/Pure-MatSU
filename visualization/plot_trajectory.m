@@ -58,13 +58,9 @@ if parser.Results.plot_vehicle
     
     % Select model
     model_name = sim_options.vehicle;
-    eval(sprintf("model = %s();", model_name));
-    % Set graphic
-    graphic_name = model.graphic;
-    eval(sprintf("graphic = %s();", graphic_name));
     
     % Instantiate a vehicle
-    vehicle = Vehicle(model);
+    vehicle = Vehicle(model_name);
     
     for index=frames_to_plot
         % Place the vehicle in the correct position and orientation
@@ -72,7 +68,7 @@ if parser.Results.plot_vehicle
         vehicle.state.set_vec_euler(states(4:6, index));
         
         % Draw the vehicle
-        draw_aircraft_body(vehicle, graphic, []);
+        draw_aircraft_body(vehicle, []);
     end
 end
 
