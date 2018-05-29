@@ -39,7 +39,6 @@ model_name = sim_options.vehicle;
 
 % Instantiate vehicle
 vehicle = Vehicle(model_name);
-vehicle.state.initialize(sim_options);
 
 % Generate the rest of the simulation components
 gravity = Gravity(sim_options);
@@ -49,6 +48,25 @@ aerodynamics = Aerodynamics(vehicle);
 kinematics = Kinematics(sim_options);
 vehicle_state_new = VehicleState(); % Use a swap variable to update vehicle state
 
+% If sim_options.controller.type == 1, then the aircraft must be trimmed
+if sim_options.controller.type==1
+    trimmer = Trimmer(sim_options); % Instantiate the trimming object
+    trimmer.calc_trim();
+    trim_state = trimmer.get_trim_state(); % Get the trim state
+    init_vec_euler = trim_state.get_vec_euler(); % Re-set the initialization state to the trim states
+    sim_options.init.vec_euler(1:2) = init_vec_euler(1:2);
+    sim_options.init.vec_vel_linear_body = trim_state.get_vec_vel_linear_body();
+    sim_options.init.vec_vel_angular_body = trim_state.get_vec_vel_angular_body();
+    trim_controls = trimmer.get_trim_controls(); % Get and set the trim controls
+    sim_options.controller.static_output = trim_controls;
+end
+
+% Initialize vehicle
+vehicle.state.initialize(sim_options);
+
+% Generate the controller object
+controller = Controller(sim_options);
+
 % Setup time vector
 t_0 = sim_options.t_0;
 t_f = sim_options.t_f;
@@ -56,8 +74,6 @@ dt = sim_options.dt;
 t = t_0;
 frame_skip = 100;
 
-% Generate the controller object
-controller = Controller(sim_options);
 
 % Initialize saved signals
 num_frames = (t_f-t_0)/dt+1;

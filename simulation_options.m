@@ -25,7 +25,7 @@ sim_options.dt = 0.001;
 % Start time (s)
 sim_options.t_0 = 0;
 % End time (s)
-sim_options.t_f = 10;
+sim_options.t_f = 30;
 
 % Simulated vehicle
 sim_options.vehicle = 'skywalker_2013';
@@ -40,18 +40,26 @@ sim_options.delete_temp_vars = true;
 %% Controller options
 
 % Choose controller. Available options:
-% 0: Constant zero output
-sim_options.controller.type = 0;
+
+% % 0: Constant output
+% sim_options.controller.type = 0;
+% sim_options.controller.static_output = [0; 0; 0.5; 0]; % Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
+
+% % 1: Constant, trimmed output.
+sim_options.controller.type = 1;
+sim_options.controller.trim_airspeed = 10; % Trim airspeed (in m/s)
+sim_options.controller.trim_path_angle = 0.1; % Trim flight path angle (in radians)
+sim_options.controller.trim_turn_radius = 50; % Trim turn radius. Positive for right turn (in m). inf for straight line.
 
 %% Initialization options
 
 % Vehicle starting position (north, east, down, in m)
-sim_options.init.vec_pos = [0;0;0];
-% Vehicle starting Euler angles (in rad)
+sim_options.init.vec_pos = [0 ; 0; 0];
+% Vehicle starting Euler angles (in rad). (Not effective with controller type = 1)
 sim_options.init.vec_euler = [0;0;0];
-% Vehicle starting velocity (body frame, in m/s)
+% Vehicle starting velocity (body frame, in m/s). (Not effective with controller type = 1)
 sim_options.init.vec_vel_linear_body = [10;0;0];
-% Vehicle starting angular velocity (body frame, in rad/s)
+% Vehicle starting angular velocity (body frame, in rad/s). (Not effective with controller type = 1)
 sim_options.init.vec_vel_angular_body = [0;0;0];
 
 %% Visualization options

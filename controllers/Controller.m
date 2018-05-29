@@ -30,8 +30,9 @@ classdef Controller < handle
             controller_type = sim_options.controller.type;
             
             % Select controller type
-            if controller_type == 0
-                obj.controller_fh = @zero_ouptut;
+            if (controller_type == 0) || (controller_type == 1)
+                obj.controller_fh = @static_ouptut;
+                obj.controller_fh(VehicleState(), sim_options.controller.static_output);
             else
                 error('unknown controller type');
             end
@@ -39,7 +40,7 @@ classdef Controller < handle
         end
         
         function control_vector = gen_control(obj, vehicle_state)
-            % CONTROLLER Class constructor
+            % GEN_CONTROL Generate controller output
             % Calls the selected controller function and delegates the controls calculation. Passes the vehicle state to
             % it.
             %
