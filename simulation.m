@@ -76,7 +76,7 @@ frame_skip = 100;
 
 
 % Initialize saved signals
-num_frames = (t_f-t_0)/dt+1;
+num_frames = (t_f-t_0)/dt;
 if sim_options.record_states
     temp_state = vehicle.state.serialize();
     array_states = zeros(size(temp_state,1),num_frames);
