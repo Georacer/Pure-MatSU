@@ -1,0 +1,14 @@
+CHANGE LOG
+==========
+
+v1.1 (2018-05-29):
+- Added `plot_trajectory` function
+- Added waitbar to simulation
+- Pushed the model and Graphic instantiation inside Vehicle
+- Added trim scripts and functionality. Also a new controller, initializing the aircraft in trim
+- Fixed bug in bad state array initialization
+- Temporary simulation variables are now deleted
+- Controllers now take time as an argument as well
+- Controllers are now classes
+
+v1.0 (2018-05-17): Initial release

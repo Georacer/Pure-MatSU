@@ -11,7 +11,7 @@ classdef Controller < handle
 % Last edit at 2018/05/16 by George Zogopoulos-Papaliakos
     
     properties
-        controller_fh; % Function handle to the selected controller
+        controller_handle; % Function handle to the selected controller
     end
     
     methods
@@ -31,15 +31,15 @@ classdef Controller < handle
             
             % Select controller type
             if (controller_type == 0) || (controller_type == 1)
-                obj.controller_fh = @static_ouptut;
-                obj.controller_fh(VehicleState(), 0, sim_options.controller.static_output);
+                output_preset = sim_options.controller.static_output;
+                obj.controller_handle = StaticOutput(output_preset);
             else
                 error('unknown controller type');
             end
             
         end
         
-        function control_vector = gen_control(obj, vehicle_state, t)
+        function control_vector = calc_output(obj, vehicle_state, t)
             % GEN_CONTROL Generate controller output
             % Calls the selected controller function and delegates the controls calculation. Passes the vehicle state to
             % it.
@@ -55,7 +55,7 @@ classdef Controller < handle
             %    and rudder input [-1,1]
             
             % Call external controller to calculate controls
-            control_vector = obj.controller_fh(vehicle_state, t);
+            control_vector = obj.controller_handle.calc_output(vehicle_state, t);
             
         end
         

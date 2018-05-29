@@ -41,15 +41,15 @@ sim_options.delete_temp_vars = true;
 
 % Choose controller. Available options:
 
-% % 0: Constant output
-% sim_options.controller.type = 0;
-% sim_options.controller.static_output = [0; 0; 0.5; 0]; % Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
+% 0: Constant output
+sim_options.controller.type = 0;
+sim_options.controller.static_output = [0; 0; 0; 0]; % Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
 
-% % 1: Constant, trimmed output.
-sim_options.controller.type = 1;
-sim_options.controller.trim_airspeed = 10; % Trim airspeed (in m/s)
-sim_options.controller.trim_path_angle = 0.1; % Trim flight path angle (in radians)
-sim_options.controller.trim_turn_radius = 50; % Trim turn radius. Positive for right turn (in m). inf for straight line.
+% % % 1: Constant, trimmed output.
+% sim_options.controller.type = 1;
+% sim_options.controller.trim_airspeed = 10; % Trim airspeed (in m/s)
+% sim_options.controller.trim_path_angle = 0.1; % Trim flight path angle (in radians)
+% sim_options.controller.trim_turn_radius = 50; % Trim turn radius. Positive for right turn (in m). inf for straight line.
 
 %% Initialization options
 
