@@ -108,7 +108,7 @@ tic
 while (t<t_f)
     
     % Generate controller output, based on previous state
-    ctrl_input = controller.gen_control(vehicle.state);
+    ctrl_input = controller.gen_control(vehicle.state, t);
     
     % Calculate gravity
     gravity.calc_gravity(vehicle);

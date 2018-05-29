@@ -1,10 +1,11 @@
-function [ control_vector ] = static_ouptut( vehicle_state, static_control )
+function [ control_vector ] = static_ouptut( vehicle_state, sim_time, static_control )
 % STATIC_OUTPUT Returns a constant control output
 %
 % Syntax:  [obj] = static_ouptut([], [0; 0; 0.5; 0])
 %
 % Inputs:
 %    vehicle_state - A VehicleState instance
+%    sim_time - The current simulation timestamp (in seconds)
 %    static_control - A 4x1 array comprised of aileron input [-1,1], elevator input [-1,1], throttle input [0,1]
 %    and rudder input [-1,1]
 %
@@ -31,7 +32,10 @@ vec_euler = vehicle_state.get_vec_euler();
 vec_vel_linear_body = vehicle_state.get_vec_vel_linear_body();
 vec_vel_angular_body = vehicle_state.get_vec_vel_angular_body();
 
-if nargin>1
+% Unused simulation time, presented for template purposes
+t = sim_time;
+
+if nargin>2
     ctrl_state = static_control;
 end
 

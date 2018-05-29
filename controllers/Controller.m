@@ -32,29 +32,30 @@ classdef Controller < handle
             % Select controller type
             if (controller_type == 0) || (controller_type == 1)
                 obj.controller_fh = @static_ouptut;
-                obj.controller_fh(VehicleState(), sim_options.controller.static_output);
+                obj.controller_fh(VehicleState(), 0, sim_options.controller.static_output);
             else
                 error('unknown controller type');
             end
             
         end
         
-        function control_vector = gen_control(obj, vehicle_state)
+        function control_vector = gen_control(obj, vehicle_state, t)
             % GEN_CONTROL Generate controller output
             % Calls the selected controller function and delegates the controls calculation. Passes the vehicle state to
             % it.
             %
-            % Syntax:  [obj] = Controller(vehicle_state)
+            % Syntax:  [obj] = Controller(vehicle_state, t)
             %
             % Inputs:
             %    vehicle_state - A VehicleState instance
+            %    t - The current simulation timestamp (in seconds)
             %
             % Outputs:
             %    control_vector - A 4x1 array comprised of aileron input [-1,1], elevator input [-1,1], throttle input [0,1]
             %    and rudder input [-1,1]
             
             % Call external controller to calculate controls
-            control_vector = obj.controller_fh(vehicle_state);
+            control_vector = obj.controller_fh(vehicle_state, t);
             
         end
         
