@@ -34,19 +34,8 @@ fprintf('Initializing simulation options...\n');
 % Generate simulation options
 sim_options = simulation_options();
 
-% Store the simulation components internally
+% Initialize the simulation components, bar the controller
 supervisor = Supervisor(sim_options);
-
-% % Instantiate vehicle
-% vehicle = Vehicle(model_name);
-% 
-% % Generate the rest of the simulation components
-% gravity = Gravity(sim_options);
-% environment = Environment(sim_options);
-% propulsion = Propulsion(vehicle);
-% aerodynamics = Aerodynamics(vehicle);
-% kinematics = Kinematics(sim_options);
-% vehicle_state_new = VehicleState(); % Use a swap variable to update vehicle state
 
 % If sim_options.controller.type == 1, then the aircraft must be trimmed
 if sim_options.controller.type==1
@@ -67,14 +56,11 @@ if sim_options.controller.type==1
     
 end
 
+% Initialize the simulation state
 supervisor.initialize_sim_state(sim_options);
+
+% Initialize the vehicle controller
 supervisor.initialize_controller(sim_options);
-% 
-% % Initialize vehicle
-% supervisor.vehicle.state.initialize(sim_options);
-% 
-% % Generate the controller object
-% sim_components.controller = Controller(sim_options);
 
 % Setup time vector
 t_0 = sim_options.solver.t_0;
@@ -120,43 +106,11 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
     frame_num = 1;
     while (t<t_f)
 
-%         % Generate controller output, based on previous state
-%         ctrl_input = controller.calc_output(vehicle.state, t);
-% 
-%         % Calculate gravity
-%         gravity.calc_gravity(vehicle);
-%         vec_gravity_force_body = gravity.get_force_body();
-% 
-%         % Calculate environment stuff
-%         environment.calc_state(vehicle);
-% 
-%         % Calculate propulsion
-%         propulsion.calc_propulsion(vehicle, environment, ctrl_input);
-%         vec_propulsion_force_body = propulsion.get_force_body();
-%         vec_propulsion_torque_body = propulsion.get_torque_body();
-% 
-%         % Calculate aerodynamics
-%         aerodynamics.calc_aerodynamics(vehicle, environment, ctrl_input);
-%         vec_aerodynamics_force_body = aerodynamics.get_force_body();
-%         vec_aerodynamics_torque_body = aerodynamics.get_torque_body();
-% 
-%         % Calculate derivatives
-%         vec_force_body = vec_gravity_force_body + vec_propulsion_force_body + vec_aerodynamics_force_body;
-%         vec_torque_body = vec_propulsion_torque_body + vec_aerodynamics_torque_body;    
-%         kinematics.set_wrench_body(vec_force_body,vec_torque_body);
-% 
-%         kinematics.set_state(vehicle.state);
-%         kinematics.calc_state_derivatives(vehicle);
-
+        % Calculate the state derivatives
         supervisor.sim_step(t);
+        
+        % Integrate the internal state with the calculated derivativess
         supervisor.integrate_fe();
-
-%         % Integrate kinematics
-%         kinematics.integrate_fe();
-% 
-%         % Update vehicle state
-%         kinematics.write_state(vehicle_state_new);
-%         vehicle.set_state(vehicle_state_new);
 
         % Update waitbar
         if mod(frame_num, frame_skip)==0
