@@ -59,6 +59,12 @@ if sim_options.controller.type==1
     sim_options.init.vec_vel_angular_body = trim_state.get_vec_vel_angular_body();
     trim_controls = trimmer.get_trim_controls(); % Get and set the trim controls
     sim_options.controller.static_output = trim_controls;
+    
+    % Clear internal variables
+    if sim_options.delete_temp_vars
+        clear trimmer trim_state trim_controls init_vec_euler
+    end
+    
 end
 
 % Initialize vehicle
