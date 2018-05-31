@@ -68,9 +68,9 @@ vehicle.state.initialize(sim_options);
 controller = Controller(sim_options);
 
 % Setup time vector
-t_0 = sim_options.t_0;
-t_f = sim_options.t_f;
-dt = sim_options.dt;
+t_0 = sim_options.solver.t_0;
+t_f = sim_options.solver.t_f;
+dt = sim_options.solver.dt;
 t = t_0;
 frame_skip = 100;
 

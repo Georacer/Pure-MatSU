@@ -41,7 +41,7 @@ classdef Kinematics < handle
             obj.vec_euler_dot = zeros(3,1);
             obj.vec_vel_linear_body_dot = zeros(3,1);
             obj.vec_vel_angular_body_dot = zeros(3,1);
-            obj.dt = sim_options.dt;
+            obj.dt = sim_options.solver.dt;
             
         end
         

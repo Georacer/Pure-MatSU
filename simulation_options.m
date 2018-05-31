@@ -20,13 +20,6 @@ function [ sim_options ] = simulation_options( )
 
 %% General simulation options
 
-% Time step (s)
-sim_options.dt = 0.001;
-% Start time (s)
-sim_options.t_0 = 0;
-% End time (s)
-sim_options.t_f = 30;
-
 % Simulated vehicle
 sim_options.vehicle = 'skywalker_2013';
 
@@ -37,19 +30,34 @@ sim_options.record_inputs = true;
 % Clear all intermediate temporary workspace variables
 sim_options.delete_temp_vars = true;
 
+%% ODE solver options
+
+% Time step (s)
+sim_options.solver.dt = 0.001;
+% Start time (s)
+sim_options.solver.t_0 = 0;
+% End time (s)
+sim_options.solver.t_f = 30;
+
+% Select the differential equations solver method
+% Available options:
+% 0 - Forward Euler
+% 1 - Matlab's ode45
+sim_options.solver.ode_solver = 1;
+
 %% Controller options
 
 % Choose controller. Available options:
 
-% 0: Constant output
-sim_options.controller.type = 0;
-sim_options.controller.static_output = [0; 0; 0; 0]; % Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
+% % 0: Constant output
+% sim_options.controller.type = 0;
+% sim_options.controller.static_output = [0; 0; 0; 0]; % Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
 
-% % % 1: Constant, trimmed output.
-% sim_options.controller.type = 1;
-% sim_options.controller.trim_airspeed = 10; % Trim airspeed (in m/s)
-% sim_options.controller.trim_path_angle = 0.1; % Trim flight path angle (in radians)
-% sim_options.controller.trim_turn_radius = 50; % Trim turn radius. Positive for right turn (in m). inf for straight line.
+% % 1: Constant, trimmed output.
+sim_options.controller.type = 1;
+sim_options.controller.trim_airspeed = 10; % Trim airspeed (in m/s)
+sim_options.controller.trim_path_angle = 0.1; % Trim flight path angle (in radians)
+sim_options.controller.trim_turn_radius = 50; % Trim turn radius. Positive for right turn (in m). inf for straight line.
 
 %% Initialization options
 
