@@ -21,6 +21,15 @@ classdef Supervisor < handle
         
         temp_state; % VehicleState object
         ctrl_input; % The control input vector
+        array_inputs; % The whole input history
+        indx_array_inputs=1;
+        save_inputs;
+        array_states; % The whole state history
+        indx_array_states=1;
+        save_states;
+        array_time; % The whole time array
+        
+        solver_type;
     end
     
     methods
@@ -47,6 +56,45 @@ classdef Supervisor < handle
             obj.kinematics = Kinematics(sim_options);
             
             obj.temp_state = VehicleState();
+            
+            obj.solver_type = sim_options.solver.solver_type;
+            % Initialize states and input arrays
+            if sim_options.solver.solver_type == 0
+            % Time vector is known
+                
+                % Retrieve the time vector parameters
+                t_0 = sim_options.solver.t_0;
+                t_f = sim_options.solver.t_f;
+                dt = sim_options.solver.dt;
+                
+                % Initialize saved signals
+                num_frames = (t_f-t_0)/dt;
+                if sim_options.record_states
+                    obj.save_states = true;
+                    temp_state = obj.vehicle.state.serialize();
+                    obj.array_states = zeros(size(temp_state,1),num_frames);
+                end
+                if sim_options.record_inputs
+                    obj.save_inputs = true;
+                    obj.array_inputs = zeros(4,num_frames);
+                end
+                
+            elseif ismember(sim_options.solver.solver_type, [1 2])
+            % Time vector size is unknown, initialize empty
+            
+                if sim_options.record_states
+                    obj.save_states = true;
+                end
+                if sim_options.record_inputs
+                    obj.save_inputs = true;
+                end
+                obj.array_states = [];
+                obj.array_inputs = [];
+                obj.array_time = [];
+                
+            else
+                error('Unuspported solver type %d specified', sim_options.solver.solver_type);
+            end
             
         end
         
@@ -125,6 +173,20 @@ classdef Supervisor < handle
             % Perform the kinematics derivative calculation
             obj.kinematics.calc_state_derivatives(obj.vehicle);
             
+            % Record resulting inputs
+            if obj.save_inputs
+                if obj.solver_type == 0
+                % Time vector is known
+                    obj.array_inputs(:,obj.indx_array_inputs) = obj.ctrl_input;
+                    obj.indx_array_inputs = obj.indx_array_inputs + 1;
+                elseif ismember(obj.solver_type, [1 2])
+                    obj.store_time(t);
+                    obj.store_inputs(obj.ctrl_input);
+                else
+                    error('Unuspported solver type %d specified', sim_options.solver.solver_type);
+                end
+            end
+            
         end
         
         function [] = update_vehicle_state_vector(obj, state_vector)
@@ -163,6 +225,20 @@ classdef Supervisor < handle
             obj.kinematics.write_state(obj.temp_state);
             % Pass the new state onto the vehicle member.
             obj.vehicle.set_state(obj.temp_state);
+            
+            % Record resulting states
+            if obj.save_states
+                if obj.solver_type == 0
+                % Time vector is known
+                    obj.array_states(:,obj.indx_array_states) = obj.vehicle.state.serialize();
+                    obj.indx_array_states = obj.indx_array_states + 1;
+                elseif ismember(obj.solver_type, [1 2])
+                % State recording is delegated to the ode solver itself
+                else
+                    error('Unuspported solver type %d specified', sim_options.solver.solver_type);
+                end
+            end
+            
         end
         
         function [state_derivatives] = ode_eval(obj, t, state_vector)
@@ -182,6 +258,70 @@ classdef Supervisor < handle
             obj.update_vehicle_state_vector(state_vector);
             obj.sim_step(t);
             state_derivatives = obj.kinematics.get_state_derivatives_serial();
+            
+        end
+        
+        function [status] = ode_outputFcn(obj, t, y, flag)
+            % ODE_OUTPUTFCN Callback from each valid ode evaluation
+            % Used to orchestrate multiple functionalities.
+            %
+            % Syntax:  [] = ode_outputFcn(t, y, flag) (Not to be called manually)
+            %
+            % Inputs:
+            %    t - Simulation time, in seconds
+            %    y - The ode state, typically a 12x1 vector with contents: 3x1 position, 3x1 Euler, 3x1 linear velocity,
+            %    3x1 angular velocity
+            %    flag - The solver state, 'init', [] or 'done'
+            %
+            % Outputs:
+            %    state_derivatives - a 12x1 vector with contents: 3x1 position derivative, 3x1 Euler angle 
+            %    derivatives, 3x1 linear velocity derivatives, 3x1 angular velocity derivatives
+            
+            
+            if isempty(flag)
+                % Normal ode step
+                
+                status = 0; % Continue solving
+                
+            elseif flag=='init'
+                % ode initializatin, nothing to do here
+                
+            elseif flag == 'done'
+                % ode ended
+                
+                % Nothing to do here
+                
+            end
+                
+        end
+        
+        function [] = store_time(obj, t)
+            % STORE_TIME Append a time to the time storage array
+            %
+            % Syntax:  [] = store_time(t)
+            %
+            % Inputs:
+            %    t - A time instance
+            %
+            % Outputs:
+            %    (none)
+            
+            obj.array_time(end+1) = t;
+            
+        end
+        
+        function [] = store_inputs(obj, ctrl_input)
+            % STORE_INPUTS Append a control vector to the storage array.
+            %
+            % Syntax:  [] = store_inputs(ctrl_input)
+            %
+            % Inputs:
+            %    ctrl_input - A 4x1 vector containing commands for Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
+            %
+            % Outputs:
+            %    (none)
+            
+            obj.array_inputs(:,end+1) = ctrl_input;
             
         end
         

@@ -7,6 +7,8 @@ This simulator is written in pure Matlab, i.e. does not make use of Simulink.
 
 It is a free-running simulation, meaning that it will execute as fast as it can, according to the capabilities of your system. It is not locked to a real-time clock.
 
+It provides for fixed time-step with Forward-Euler integration, or the use of Matlab's ode45 and ode15s solvers.
+
 Please use the version releases to ensure that your downloaded version is as bug-free as possible and has updated documentation.
 
 ## User Instructions

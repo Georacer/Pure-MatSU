@@ -25,6 +25,9 @@ close all;
 clear;
 clc;
 
+% Enable warnings
+warn_state = warning('on','all');
+
 % load_path;
 
 %% Initialize the simulation
@@ -65,20 +68,7 @@ supervisor.initialize_controller(sim_options);
 % Setup time vector
 t_0 = sim_options.solver.t_0;
 t_f = sim_options.solver.t_f;
-dt = sim_options.solver.dt;
-t = t_0;
 frame_skip = 100;
-
-
-% Initialize saved signals
-num_frames = (t_f-t_0)/dt;
-if sim_options.record_states
-    temp_state = supervisor.vehicle.state.serialize();
-    array_states = zeros(size(temp_state,1),num_frames);
-end
-if sim_options.record_inputs
-    array_inputs = zeros(4,num_frames);
-end
 
 % Initialize visualization
 if sim_options.visualization.draw_graphics
@@ -104,6 +94,10 @@ tic
 if sim_options.solver.solver_type == 0 % Forward-Euler selected
 
     frame_num = 1;
+    t = t_0;
+    dt = sim_options.solver.dt;
+    num_frames = (t_f-t_0)/dt;
+    
     while (t<t_f)
 
         % Calculate the state derivatives
@@ -115,13 +109,6 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
         % Update waitbar
         if mod(frame_num, frame_skip)==0
             waitbar(frame_num/num_frames, wb_h);
-        end
-
-        if sim_options.record_states
-            array_states(:,frame_num) = supervisor.vehicle.state.serialize();
-        end
-        if sim_options.record_inputs
-            array_inputs(:,frame_num) = supervisor.ctrl_input;
         end
 
         % Update visual output
@@ -139,40 +126,60 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
         frame_num = frame_num+1;
 
     end
-
-    % Store simulation results to output struct
-    sim_output.array_time = t_0:dt:(t_f-dt);
-    sim_output.array_inputs = array_inputs;
-    sim_output.array_states = array_states;
+    
+    % Export simulation results
+    if (sim_options.record_states || sim_options.record_inputs)
+        sim_output.array_time = t_0:dt:(t_f-dt);
+    end
+    if (sim_options.record_states)
+        sim_output.array_states = supervisor.array_states;
+    end
+    if (sim_options.record_inputs)
+        sim_output.array_inputs = supervisor.array_inputs;
+    end
     
     % Clear internal variables
     if sim_options.delete_temp_vars
         clear array_inputs array_states vehicle_state_new temp_state ctrl_input
         clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
-        clear dt num_frames frame_num frame_skip
-        clear t
+        clear num_frames frame_num frame_skip
+        clear t dt
     end
     
 
-elseif ismember(sim_options.solver.solver_type, [1 2]) % Matlab ode* queried
+elseif ismember(sim_options.solver.solver_type, [1 2]) % Matlab ode* requested
     
+    % Set initial problem state
     y0 = supervisor.vehicle.state.serialize();
+    % Set system function
     odefun = @supervisor.ode_eval;
+    options = odeset('outputFcn', @supervisor.ode_outputFcn);
     
-    if sim_options.solver.solver_type == 1
+    if sim_options.solver.solver_type == 1 % If ode45 requested
         
-        [t, y] = ode45(odefun, [t_0 t_f], y0);
-    elseif sim_options.solver.solver_type == 2
+        [t, y] = ode45(odefun, [t_0 t_f], y0, options);
         
-        [t, y] = ode15s(odefun, [t_0 t_f], y0);
+    elseif sim_options.solver.solver_type == 2 % If ode15s requested
+        
+        [t, y] = ode15s(odefun, [t_0 t_f], y0, options);
+        
     end
     
-    sim_output.array_time = t;
-    sim_output.array_states = y';
+    % Export simulation results
+    if (sim_options.record_states || sim_options.record_inputs)
+        sim_output.array_time = t';
+    end
+    if (sim_options.record_states)
+        sim_output.array_states = y';
+    end
+    if (sim_options.record_inputs)
+        disp('haerea');
+        warning('Exporting of control inputs not supported with Matlab''s ode solvers');
+    end
     
     % Clear internal variables
     if sim_options.delete_temp_vars
-        clear y0 y t
+        clear y0 y t odefun options
     end
     
 else
@@ -189,8 +196,12 @@ fprintf('Simulation duration: %f\n', t_f-t_0);
 fprintf('Required wall time: %f\n', wall_time);
 fprintf('Achieved speedup ratio: %f\n', (t_f-t_0)/wall_time);
 
+% Restore warnign state
+warning(warn_state);
+
 % Clear internal variables
 if sim_options.delete_temp_vars
-    clear vehicle aerodynamics gravity propulsion kinematics environment controller;
+    clear supervisor temp_state
     clear wall_time t_0 t_f num_frames frame_skip wb_h
+    clear warn_state
 end

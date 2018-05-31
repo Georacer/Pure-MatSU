@@ -33,7 +33,7 @@ sim_options.delete_temp_vars = true;
 %% ODE solver options
 
 % Time step (s)
-sim_options.solver.dt = 0.001; % (Not used if ode_solver==1)
+sim_options.solver.dt = 0.001; % (Not used if ode_solver!=0)
 % Start time (s)
 sim_options.solver.t_0 = 0;
 % End time (s)
@@ -41,9 +41,9 @@ sim_options.solver.t_f = 30;
 
 % Select the differential equations solver method
 % Available options:
-% 0 - Forward Euler
-% 1 - Matlab's ode45
-% 2 - Matlab's ode15s
+% 0 - Forward Euler, allows very fine time resolution
+% 1 - Matlab's ode45, a good balane between resolution and speed
+% 2 - Matlab's ode15s, fast but maybe with crude resolution
 sim_options.solver.solver_type = 1;
 
 %% Controller options
