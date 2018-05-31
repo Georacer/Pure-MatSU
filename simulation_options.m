@@ -33,7 +33,7 @@ sim_options.delete_temp_vars = true;
 %% ODE solver options
 
 % Time step (s)
-sim_options.solver.dt = 0.001;
+sim_options.solver.dt = 0.001; % (Not used if ode_solver==1)
 % Start time (s)
 sim_options.solver.t_0 = 0;
 % End time (s)
@@ -43,7 +43,7 @@ sim_options.solver.t_f = 30;
 % Available options:
 % 0 - Forward Euler
 % 1 - Matlab's ode45
-sim_options.solver.ode_solver = 1;
+sim_options.solver.solver_type = 0;
 
 %% Controller options
 

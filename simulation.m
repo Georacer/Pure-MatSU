@@ -34,19 +34,19 @@ fprintf('Initializing simulation options...\n');
 % Generate simulation options
 sim_options = simulation_options();
 
-% Select model
-model_name = sim_options.vehicle;
+% Store the simulation components internally
+supervisor = Supervisor(sim_options);
 
-% Instantiate vehicle
-vehicle = Vehicle(model_name);
-
-% Generate the rest of the simulation components
-gravity = Gravity(sim_options);
-environment = Environment(sim_options);
-propulsion = Propulsion(vehicle);
-aerodynamics = Aerodynamics(vehicle);
-kinematics = Kinematics(sim_options);
-vehicle_state_new = VehicleState(); % Use a swap variable to update vehicle state
+% % Instantiate vehicle
+% vehicle = Vehicle(model_name);
+% 
+% % Generate the rest of the simulation components
+% gravity = Gravity(sim_options);
+% environment = Environment(sim_options);
+% propulsion = Propulsion(vehicle);
+% aerodynamics = Aerodynamics(vehicle);
+% kinematics = Kinematics(sim_options);
+% vehicle_state_new = VehicleState(); % Use a swap variable to update vehicle state
 
 % If sim_options.controller.type == 1, then the aircraft must be trimmed
 if sim_options.controller.type==1
@@ -67,11 +67,14 @@ if sim_options.controller.type==1
     
 end
 
-% Initialize vehicle
-vehicle.state.initialize(sim_options);
-
-% Generate the controller object
-controller = Controller(sim_options);
+supervisor.initialize_sim_state(sim_options);
+supervisor.initialize_controller(sim_options);
+% 
+% % Initialize vehicle
+% supervisor.vehicle.state.initialize(sim_options);
+% 
+% % Generate the controller object
+% sim_components.controller = Controller(sim_options);
 
 % Setup time vector
 t_0 = sim_options.solver.t_0;
@@ -84,7 +87,7 @@ frame_skip = 100;
 % Initialize saved signals
 num_frames = (t_f-t_0)/dt;
 if sim_options.record_states
-    temp_state = vehicle.state.serialize();
+    temp_state = supervisor.vehicle.state.serialize();
     array_states = zeros(size(temp_state,1),num_frames);
 end
 if sim_options.record_inputs
@@ -109,81 +112,110 @@ fprintf('Starting simulation...\n');
 wb_h = waitbar(0, 'Simulation running...');
 
 % Main loop:
-frame_num = 1;
 tic
-while (t<t_f)
-    
-    % Generate controller output, based on previous state
-    ctrl_input = controller.calc_output(vehicle.state, t);
-    
-    % Calculate gravity
-    gravity.calc_gravity(vehicle);
-    vec_gravity_force_body = gravity.get_force_body();
-    
-    % Calculate environment stuff
-    environment.calc_state(vehicle);
-    
-    % Calculate propulsion
-    propulsion.calc_propulsion(vehicle, environment, ctrl_input);
-    vec_propulsion_force_body = propulsion.get_force_body();
-    vec_propulsion_torque_body = propulsion.get_torque_body();
-    
-    % Calculate aerodynamics
-    aerodynamics.calc_aerodynamics(vehicle, environment, ctrl_input);
-    vec_aerodynamics_force_body = aerodynamics.get_force_body();
-    vec_aerodynamics_torque_body = aerodynamics.get_torque_body();
-    
-    % Calculate derivatives
-    vec_force_body = vec_gravity_force_body + vec_propulsion_force_body + vec_aerodynamics_force_body;
-    vec_torque_body = vec_propulsion_torque_body + vec_aerodynamics_torque_body;    
-    kinematics.set_wrench_body(vec_force_body,vec_torque_body);
-    
-    kinematics.set_state(vehicle.state);
-    kinematics.calc_state_derivatives(vehicle);
-    
-    % Integrate kinematics
-    kinematics.integrate();
-    
-    % Update vehicle state
-    kinematics.write_state(vehicle_state_new);
-    vehicle.set_state(vehicle_state_new);
-    
-    % Update waitbar
-    if mod(frame_num, frame_skip)==0
-        waitbar(frame_num/num_frames, wb_h);
-    end
-    
-    if sim_options.record_states
-        array_states(:,frame_num) = vehicle.state.serialize();
-    end
-    if sim_options.record_inputs
-        array_inputs(:,frame_num) = ctrl_input;
-    end
-    
-    % Update visual output
-    if sim_options.visualization.draw_graphics
-        draw_aircraft(vehicle, false);
-    end
-    if sim_options.visualization.draw_forces
-        plot_forces(gravity, propulsion, aerodynamics, t, false);
-    end
-    if sim_options.visualization.draw_states
-        plot_states(vehicle, t, false);
-    end
-    
-    t = t + dt;
-    frame_num = frame_num+1;
-    
-end
-wall_time = toc;
 
+% Choose ODE solver
+if sim_options.solver.solver_type == 0 % Forward-Euler selected
+
+    frame_num = 1;
+    while (t<t_f)
+
+%         % Generate controller output, based on previous state
+%         ctrl_input = controller.calc_output(vehicle.state, t);
+% 
+%         % Calculate gravity
+%         gravity.calc_gravity(vehicle);
+%         vec_gravity_force_body = gravity.get_force_body();
+% 
+%         % Calculate environment stuff
+%         environment.calc_state(vehicle);
+% 
+%         % Calculate propulsion
+%         propulsion.calc_propulsion(vehicle, environment, ctrl_input);
+%         vec_propulsion_force_body = propulsion.get_force_body();
+%         vec_propulsion_torque_body = propulsion.get_torque_body();
+% 
+%         % Calculate aerodynamics
+%         aerodynamics.calc_aerodynamics(vehicle, environment, ctrl_input);
+%         vec_aerodynamics_force_body = aerodynamics.get_force_body();
+%         vec_aerodynamics_torque_body = aerodynamics.get_torque_body();
+% 
+%         % Calculate derivatives
+%         vec_force_body = vec_gravity_force_body + vec_propulsion_force_body + vec_aerodynamics_force_body;
+%         vec_torque_body = vec_propulsion_torque_body + vec_aerodynamics_torque_body;    
+%         kinematics.set_wrench_body(vec_force_body,vec_torque_body);
+% 
+%         kinematics.set_state(vehicle.state);
+%         kinematics.calc_state_derivatives(vehicle);
+
+        supervisor.sim_step(t);
+        supervisor.integrate_fe();
+
+%         % Integrate kinematics
+%         kinematics.integrate_fe();
+% 
+%         % Update vehicle state
+%         kinematics.write_state(vehicle_state_new);
+%         vehicle.set_state(vehicle_state_new);
+
+        % Update waitbar
+        if mod(frame_num, frame_skip)==0
+            waitbar(frame_num/num_frames, wb_h);
+        end
+
+        if sim_options.record_states
+            array_states(:,frame_num) = supervisor.vehicle.state.serialize();
+        end
+        if sim_options.record_inputs
+            array_inputs(:,frame_num) = supervisor.ctrl_input;
+        end
+
+        % Update visual output
+        if sim_options.visualization.draw_graphics
+            draw_aircraft(supervisor.vehicle, false);
+        end
+        if sim_options.visualization.draw_forces
+            plot_forces(supervisor.gravity, supervisor.propulsion, supervisor.aerodynamics, t, false);
+        end
+        if sim_options.visualization.draw_states
+            plot_states(supervisor.vehicle, t, false);
+        end
+
+        t = t + dt;
+        frame_num = frame_num+1;
+
+    end
+
+    % Store simulation results to output struct
+    sim_output.array_time = t_0:dt:(t_f-dt);
+    sim_output.array_inputs = array_inputs;
+    sim_output.array_states = array_states;
+    
+    % Clear internal variables
+    if sim_options.delete_temp_vars
+        clear array_inputs array_states vehicle_state_new temp_state ctrl_input
+        clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
+        clear dt num_frames frame_num frame_skip
+    end
+    
+
+elseif sim_options.solver.solver_type == 1 % ode45 selected
+    
+    
+    
+    [t, y] = ode45(odefun, [t_0 t_f], y0);
+    
+    % Clear internal variables
+    if sim_options.delete_temp_vars
+    end
+    
+else
+    error('Unsupported solver_type=%d specified',sim_options.solver.solver_type);
+end
+
+wall_time = toc;
 % Close waitbar
 close(wb_h);
-
-% Store simulation results to output struct
-sim_output.array_inputs = array_inputs;
-sim_output.array_states = array_states;
-
 
 fprintf('Simulation ended\n\n');
 
@@ -194,8 +226,5 @@ fprintf('Achieved speedup ratio: %f\n', (t_f-t_0)/wall_time);
 % Clear internal variables
 if sim_options.delete_temp_vars
     clear vehicle aerodynamics gravity propulsion kinematics environment controller;
-    clear array_inputs array_states vehicle_state_new temp_state ctrl_input
-    clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
-    clear dt wall_time t t_0 t_f num_frames frame_num frame_skip wb_h
-    clear model_name
+    clear wall_time t t_0 t_f num_frames frame_skip wb_h
 end
