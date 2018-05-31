@@ -229,7 +229,7 @@ classdef VehicleState < handle
             %   (none)
             %
             % Outputs:
-            %    states - a vector containing the NED position, Euler-angle orientation, body-frame linear velocity and
+            %    states - a 12x1 vector containing the NED position, Euler-angle orientation, body-frame linear velocity and
             %    body-frame angular velocity
 
             states = zeros(obj.num_states,1);

@@ -43,7 +43,8 @@ sim_options.solver.t_f = 30;
 % Available options:
 % 0 - Forward Euler
 % 1 - Matlab's ode45
-sim_options.solver.solver_type = 0;
+% 2 - Matlab's ode15s
+sim_options.solver.solver_type = 1;
 
 %% Controller options
 

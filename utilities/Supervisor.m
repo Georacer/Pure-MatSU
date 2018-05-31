@@ -180,6 +180,7 @@ classdef Supervisor < handle
             %    derivatives, 3x1 linear velocity derivatives, 3x1 angular velocity derivatives
             
             obj.update_vehicle_state_vector(state_vector);
+            obj.sim_step(t);
             state_derivatives = obj.kinematics.get_state_derivatives_serial();
             
         end

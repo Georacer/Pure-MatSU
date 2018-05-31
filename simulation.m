@@ -150,17 +150,29 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
         clear array_inputs array_states vehicle_state_new temp_state ctrl_input
         clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
         clear dt num_frames frame_num frame_skip
+        clear t
     end
     
 
-elseif sim_options.solver.solver_type == 1 % ode45 selected
+elseif ismember(sim_options.solver.solver_type, [1 2]) % Matlab ode* queried
     
+    y0 = supervisor.vehicle.state.serialize();
+    odefun = @supervisor.ode_eval;
     
+    if sim_options.solver.solver_type == 1
+        
+        [t, y] = ode45(odefun, [t_0 t_f], y0);
+    elseif sim_options.solver.solver_type == 2
+        
+        [t, y] = ode15s(odefun, [t_0 t_f], y0);
+    end
     
-    [t, y] = ode45(odefun, [t_0 t_f], y0);
+    sim_output.array_time = t;
+    sim_output.array_states = y';
     
     % Clear internal variables
     if sim_options.delete_temp_vars
+        clear y0 y t
     end
     
 else
@@ -180,5 +192,5 @@ fprintf('Achieved speedup ratio: %f\n', (t_f-t_0)/wall_time);
 % Clear internal variables
 if sim_options.delete_temp_vars
     clear vehicle aerodynamics gravity propulsion kinematics environment controller;
-    clear wall_time t t_0 t_f num_frames frame_skip wb_h
+    clear wall_time t_0 t_f num_frames frame_skip wb_h
 end
