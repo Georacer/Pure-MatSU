@@ -39,14 +39,14 @@ classdef Propulsion < handle
             if model_type == 1
                 obj.propulsion_mdl_fh = @obj.propulsion_mdl_1;
             else
-                error("unknown model type");
+                error('unknown model type');
             end
             
         end
         
         function propulsion_mdl_1(obj, vehicle, environment, ctrl_input)
             % PROPULSION_MDL_1 Simplistic electric motor model
-            % Found in Beard and McLain's book "Small Unmanned Aircraft"
+            % Found in Beard and McLain's book 'Small Unmanned Aircraft'
             %
             % Syntax:  [] = propulsion_mdl_1(vehicle, environment, ctrl_input)
             %

@@ -68,7 +68,7 @@ parameters.propulsion.c_prop = 1.0;
 
 %% Vehicle graphic
 
-parameters.graphic = "airplane_1";
+parameters.graphic = 'airplane_1';
 
 end
 

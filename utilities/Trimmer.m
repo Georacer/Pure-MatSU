@@ -108,7 +108,7 @@ classdef Trimmer < handle
             %    1: roll 2: pitch 3: u 4: v 5: w 6: p 7: q 8: r 9: aileron 10: elevator 11: throttle 12: rudder
             %    cost - Final optimization cost function value
             
-            fprintf("Trimming aircraft...\n");
+            fprintf('Trimming aircraft...\n');
             
             % Setup initial optimization argument value
             argument_init = [obj.x0(obj.ix); obj.u0(obj.iu)]; % 8 states and 4 inputs
@@ -125,11 +125,11 @@ classdef Trimmer < handle
             % Store trimmed controls
             obj.trim_controls = [solution(9); solution(10); solution(11); solution(12)];
             
-            fprintf("Trimming ended:\n");
+            fprintf('Trimming ended:\n');
             Va = norm(solution(3:5));
-            fprintf("Achieved airspeed: %g\n", Va);
+            fprintf('Achieved airspeed: %g\n', Va);
             
-            fprintf("Trimmed control inputs: "); disp(solution(9:12)');
+            fprintf('Trimmed control inputs: '); disp(solution(9:12)');
             
             results = cell(3,10);
             derivatives_actual = obj.kinematics.get_state_derivatives();
@@ -147,10 +147,10 @@ classdef Trimmer < handle
             results{1,8} = 'p_dot';     results{2,8} = obj.dx0(10);     results{3,8} = x_dot_actual(10);
             results{1,9} = 'q_dot';     results{2,9} = obj.dx0(11);     results{3,9} = x_dot_actual(11);
             results{1,10} = 'r_dot';    results{2,10} = obj.dx0(12);    results{3,10} = x_dot_actual(12);
-            fprintf("Derivatives:\n");
+            fprintf('Derivatives:\n');
             disp(results);
-            fprintf("Final cost: %g\n", cost);
-            fprintf("Optimization finished in %d iterations\n", output.iterations);
+            fprintf('Final cost: %g\n', cost);
+            fprintf('Optimization finished in %d iterations\n', output.iterations);
             temp_cell = cell2mat(results(2:3,:));
             disp(sum(temp_cell(1,:)-temp_cell(2,:),2)^2);
             

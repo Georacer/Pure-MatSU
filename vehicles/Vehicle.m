@@ -27,13 +27,13 @@ classdef Vehicle < handle
             %
             % Inputs:
             %    model_name - Name of model. Must be the name of a model function in the vehicles folder e.g.
-            %    "skywalker_2013".
+            %    'skywalker_2013'.
             %
             % Outputs:
             %    obj - Class instance
             
             
-            eval(sprintf("model = %s();", model_name));
+            eval(sprintf('model = %s();', model_name));
             
             obj.state = VehicleState();
             
@@ -45,7 +45,7 @@ classdef Vehicle < handle
             
             % Set graphic
             graphic_name = model.graphic;
-            eval(sprintf("obj.graphic = %s();", graphic_name));
+            eval(sprintf('obj.graphic = %s();', graphic_name));
             
         end
         

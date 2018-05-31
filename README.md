@@ -46,7 +46,7 @@ and obviously correspond to vehicles with the airplane form.
 By default, the option is set to 0, corresponding to the `StaticOutput` controller. This controller generates a constant, zero output for all four inputs.
 
 To write your own controller, first create a new controller function in the `controllers` folder. Use the `StaticOutput` controller as a template.
-Your controller class must have at least a constructor to initialize itself and a method `strl_output = calc_output(sim_vehicle, t)` with the same signature as the one in `StaticOutput`.
+Your controller class must have at least a constructor to initialize itself and a method `ctrl_output = calc_output(sim_vehicle, t)` with the same signature as the one in `StaticOutput`.
 
 Then, edit the `Controller` class to assign an index to your controller and add an option for it in the class constructor. This is also where you will setup any initialization options for your controller.
 Finally, edit the `simulation_options` function and set your new controller index in the `sim_options.controller.type` field, along with any other required parameters.

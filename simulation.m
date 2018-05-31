@@ -29,7 +29,7 @@ clc;
 
 %% Initialize the simulation
 
-fprintf("Initializing simulation options...\n");
+fprintf('Initializing simulation options...\n');
 
 % Generate simulation options
 sim_options = simulation_options();
@@ -98,7 +98,7 @@ end
 
 %% Begin simulation
 
-fprintf("Starting simulation...\n");
+fprintf('Starting simulation...\n');
 
 wb_h = waitbar(0, 'Simulation running...');
 
@@ -179,11 +179,11 @@ sim_output.array_inputs = array_inputs;
 sim_output.array_states = array_states;
 
 
-fprintf("Simulation ended\n\n");
+fprintf('Simulation ended\n\n');
 
-fprintf("Simulation duration: %f\n", t_f-t_0);
-fprintf("Required wall time: %f\n", wall_time);
-fprintf("Achieved speedup ratio: %f\n", (t_f-t_0)/wall_time);
+fprintf('Simulation duration: %f\n', t_f-t_0);
+fprintf('Required wall time: %f\n', wall_time);
+fprintf('Achieved speedup ratio: %f\n', (t_f-t_0)/wall_time);
 
 % Clear internal variables
 if sim_options.delete_temp_vars
