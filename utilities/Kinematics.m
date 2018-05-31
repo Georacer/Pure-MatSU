@@ -114,7 +114,7 @@ classdef Kinematics < handle
         
         function answer = get_state_derivatives(obj)
             % GET_STATE_DERIVATIVES Accessor for the internal state derivatives members
-            % Return the internal state derivatives
+            % Return the internal state derivatives as a structure
             %
             % Syntax:  [answer] = get_state_derivatives()
             %
@@ -132,8 +132,31 @@ classdef Kinematics < handle
             
         end
         
-        function integrate(obj)  
+        function answer = get_state_derivatives_serial(obj)
+            % GET_STATE_DERIVATIVES_SERIAL Accessor for the internal state derivatives members
+            % Return the internal state derivatives as a vertical vector
+            %
+            % Syntax:  [answer] = get_state_derivatives_serial()
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    answer - a 12x1 vector with contents: 3x1 position derivative, 3x1 Euler angle derivatives, 3x1 linear
+            %    velocity derivatives, 3x1 angular velocity derivatives
+            
+            answer = [...
+                obj.vec_pos_dot;...
+                obj.vec_euler_dot;...
+                obj.vec_vel_linear_body_dot;...
+                obj.vec_vel_angular_body_dot...
+                ];            
+            
+        end
+        
+        function integrate_fe(obj)  
             % INTEGRATE Integrate internal state using the internal state derivatives, for one time step
+            % Uses Forward-Euler integration
             %
             % Syntax:  [] = integrate()
             %

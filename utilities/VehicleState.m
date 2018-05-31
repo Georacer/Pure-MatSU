@@ -79,6 +79,26 @@ classdef VehicleState < handle
             
         end
         
+        function set_state_vector(obj, external_state_vector)
+            % SET_STATE_VETOR Vehicle state setter
+            % Uses the a passed vector containing the vehicle state
+            %
+            % Syntax:  [] = set_state(model)
+            %
+            % Inputs:
+            %    external_state_vector - a 12x1 vector with contents: 3x1 position derivative, 3x1 Euler angle 
+            %    derivatives, 3x1 linear velocity derivatives, 3x1 angular velocity derivatives
+            %
+            % Outputs:
+            %    (none)
+            
+            obj.set_vec_pos(external_state_vector(1:3));
+            obj.set_vec_euler(external_state_vector(4:6));
+            obj.set_vec_vel_linear_body(external_state_vector(7:9));
+            obj.set_vec_vel_angular_body(external_state_vector(10:12));
+            
+        end
+        
         function vec_pos = get_vec_pos(obj)
             % GET_VEC_POS - Returns the vehicle position vector
             %
