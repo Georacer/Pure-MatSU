@@ -1,6 +1,12 @@
 CHANGE LOG
 ==========
 
+v1.2 (2018-05-31):
+- Fixed older Matlab version bug with double-quoted strings
+- Added support for Matlab's ode45 and ode15s solvers. Control input cannot be saved in these cases
+- Created supervisor class to orchestrate the simulation model operations
+- Added a few more methods here and there
+
 v1.1 (2018-05-29):
 - Added `plot_trajectory` function
 - Added waitbar to simulation
