@@ -128,13 +128,12 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
     end
     
     % Export simulation results
-    if (sim_options.record_states || sim_options.record_inputs)
-        sim_output.array_time = t_0:dt:(t_f-dt);
-    end
     if (sim_options.record_states)
+        sim_output.array_time_states = supervisor.array_time_states;
         sim_output.array_states = supervisor.array_states;
     end
     if (sim_options.record_inputs)
+        sim_output.array_time_inputs = supervisor.array_time_inputs;
         sim_output.array_inputs = supervisor.array_inputs;
     end
     
@@ -166,14 +165,14 @@ elseif ismember(sim_options.solver.solver_type, [1 2]) % Matlab ode* requested
     end
     
     % Export simulation results
-    if (sim_options.record_states || sim_options.record_inputs)
-        sim_output.array_time = t';
-    end
     if (sim_options.record_states)
+        sim_output.array_time_states = t';
         sim_output.array_states = y';
     end
     if (sim_options.record_inputs)
-        warning('Exporting of control inputs not supported with Matlab''s ode solvers');
+        warning('Using Matlab''s ode solvers does not allow saving of control inputs at the returned time vector');
+        sim_output.array_time_inputs = supervisor.array_time_inputs;
+        sim_output.array_inputs = supervisor.array_inputs;
     end
     
     % Clear internal variables

@@ -19,6 +19,8 @@ classdef Supervisor < handle
         kinematics; % Kinematics object
         controller; % Controller object
         
+        t; % Simulation time
+        
         temp_state; % VehicleState object
         ctrl_input; % The control input vector
         array_inputs; % The whole input history
@@ -27,7 +29,8 @@ classdef Supervisor < handle
         array_states; % The whole state history
         indx_array_states=1;
         save_states;
-        array_time; % The whole time array
+        array_time_states; % Time array, referring to state evaluations
+        array_time_inputs; % Time array, referring to control input evaluations
         
         solver_type;
     end
@@ -73,10 +76,12 @@ classdef Supervisor < handle
                     obj.save_states = true;
                     temp_state = obj.vehicle.state.serialize();
                     obj.array_states = zeros(size(temp_state,1),num_frames);
+                    obj.array_time_states = zeros(1, num_frames);
                 end
                 if sim_options.record_inputs
                     obj.save_inputs = true;
-                    obj.array_inputs = zeros(4,num_frames);
+                    obj.array_inputs = zeros(4, num_frames);
+                    obj.array_time_inputs = zeros(1, num_frames);
                 end
                 
             elseif ismember(sim_options.solver.solver_type, [1 2])
@@ -84,13 +89,14 @@ classdef Supervisor < handle
             
                 if sim_options.record_states
                     obj.save_states = true;
+                    obj.array_states = [];
+                    obj.array_time_states = [];
                 end
                 if sim_options.record_inputs
                     obj.save_inputs = true;
+                    obj.array_inputs = [];
+                    obj.array_time_inputs = [];
                 end
-                obj.array_states = [];
-                obj.array_inputs = [];
-                obj.array_time = [];
                 
             else
                 error('Unuspported solver type %d specified', sim_options.solver.solver_type);
@@ -143,6 +149,9 @@ classdef Supervisor < handle
             % Outputs:
             %    (none)
             
+            % Store simulation time
+            obj.t = t;
+            
             % Generate controller output, based on previous state
             obj.ctrl_input = obj.controller.calc_output(obj.vehicle.state, t);
             
@@ -176,12 +185,11 @@ classdef Supervisor < handle
             % Record resulting inputs
             if obj.save_inputs
                 if obj.solver_type == 0
-                % Time vector is known
-                    obj.array_inputs(:,obj.indx_array_inputs) = obj.ctrl_input;
+                	obj.store_time_inputs(t, obj.indx_array_inputs); % Store input calculation time
+                    obj.store_inputs(obj.ctrl_input, obj.indx_array_inputs); % Store control input
                     obj.indx_array_inputs = obj.indx_array_inputs + 1;
                 elseif ismember(obj.solver_type, [1 2])
-                    obj.store_time(t);
-                    obj.store_inputs(obj.ctrl_input);
+                    % Do nothing, because ode solvers may do dummy calls of the system function. Use outputFcn instaed.
                 else
                     error('Unuspported solver type %d specified', sim_options.solver.solver_type);
                 end
@@ -229,8 +237,8 @@ classdef Supervisor < handle
             % Record resulting states
             if obj.save_states
                 if obj.solver_type == 0
-                % Time vector is known
-                    obj.array_states(:,obj.indx_array_states) = obj.vehicle.state.serialize();
+                    obj.store_time_states(obj.t, obj.indx_array_states); % Store time instance
+                    obj.store_states(obj.vehicle.state.serialize(), obj.indx_array_states); % Store state vector
                     obj.indx_array_states = obj.indx_array_states + 1;
                 elseif ismember(obj.solver_type, [1 2])
                 % State recording is delegated to the ode solver itself
@@ -281,47 +289,118 @@ classdef Supervisor < handle
             if isempty(flag)
                 % Normal ode step
                 
+                obj.store_time_inputs(obj.t); % Save time instance. Cannot pass t argument, because it may be vector
+                obj.store_inputs(obj.ctrl_input); % Save contorl vector
                 status = 0; % Continue solving
                 
             elseif flag=='init'
                 % ode initializatin, nothing to do here
                 
             elseif flag == 'done'
-                % ode ended
-                
-                % Nothing to do here
+                % ode ended, nothing to do here
                 
             end
                 
         end
         
-        function [] = store_time(obj, t)
-            % STORE_TIME Append a time to the time storage array
+        function [] = store_time_states(obj, t, index)
+            % store_time_states Append a time to the time storage array, referring to state evaluations
+            % If called with only the first argument, will append the provided time to the end of the array. If the size
+            % of array_time_states is known and the array is preallocated, then use the index argument to select the
+            % storage location.
             %
-            % Syntax:  [] = store_time(t)
+            % Syntax:  [] = store_time_states(t)
+            %          [] = store_time_states(t, index)
             %
             % Inputs:
             %    t - A time instance
+            %    index - The array index at which t is to be stored.
             %
             % Outputs:
             %    (none)
             
-            obj.array_time(end+1) = t;
+            if nargin<3            
+                obj.array_time_states(end+1) = t;
+            else
+                obj.array_time_states(index) = t;
+            end
             
         end
         
-        function [] = store_inputs(obj, ctrl_input)
-            % STORE_INPUTS Append a control vector to the storage array.
+        function [] = store_states(obj, state_vector, index)
+            % STORE_states Append a state vector to the storage array.
+            % If called with only the first argument, will append the provided state to the end of the array. If the size
+            % of array_states is known and the array is preallocated, then use the index argument to select the
+            % storage location.
             %
-            % Syntax:  [] = store_inputs(ctrl_input)
+            % Syntax:  [] = store_states(state_vector)
+            %          [] = store_states(state_vector, index)
             %
             % Inputs:
-            %    ctrl_input - A 4x1 vector containing commands for Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
+            %    state_vector - a 12x1 vector with contents: 3x1 position, 3x1 Euler, 3x1 linear velocity,
+            %    3x1 angular velocity
+            %    index - The array index at which t is to be stored.
             %
             % Outputs:
             %    (none)
             
-            obj.array_inputs(:,end+1) = ctrl_input;
+            if nargin<3            
+                obj.array_states(end+1) = state_vector;
+            else
+                obj.array_states(:, index) = state_vector;
+            end
+            
+        end
+            
+        
+        function [] = store_time_inputs(obj, t, index)
+            % store_time_inputs Append a time to the time storage array, referring to control input evaluations
+            % If called with only the first argument, will append the provided time to the end of the array. If the size
+            % of array_time_inputs is known and the array is preallocated, then use the index argument to select the
+            % storage location.
+            %
+            % Syntax:  [] = store_time_inputs(t)
+            %          [] = store_time_inputs(t, index)
+            %
+            % Inputs:
+            %    t - A time instance
+            %    index - The array index at which t is to be stored.
+            %
+            % Outputs:
+            %    (none)
+            
+            if nargin<3
+                obj.array_time_inputs = [obj.array_time_inputs t];
+            else
+                if ~isscalar(t)
+                    error('Cannot handle non-scalar time value');
+                end
+                obj.array_time_inputs(index) = t;
+            end
+            
+        end
+        
+        function [] = store_inputs(obj, ctrl_input, index)
+            % STORE_INPUTS Append a control vector to the storage array.
+            % If called with only the first argument, will append the provided input to the end of the array. If the size
+            % of array_inputs is known and the array is preallocated, then use the index argument to select the
+            % storage location.
+            %
+            % Syntax:  [] = store_inputs(ctrl_input)
+            %          [] = store_inputs(ctrl_input, index)
+            %
+            % Inputs:
+            %    ctrl_input - A 4x1 vector containing commands for Aileron [-1, 1], elevator [-1, 1], throttle [0, 1], rudder [-1, 1]
+            %    index - The array index at which t is to be stored.
+            %
+            % Outputs:
+            %    (none)
+            
+            if nargin<3            
+                obj.array_inputs = [obj.array_inputs ctrl_input];
+            else
+                obj.array_inputs(:, index) = ctrl_input;
+            end
             
         end
         
