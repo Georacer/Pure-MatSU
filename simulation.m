@@ -68,7 +68,6 @@ supervisor.initialize_controller(sim_options);
 % Setup time vector
 t_0 = sim_options.solver.t_0;
 t_f = sim_options.solver.t_f;
-frame_skip = 100;
 
 if sim_options.visualization.draw_forces
     plot_forces(gravity, propulsion, aerodynamics, 0, true);    
@@ -80,8 +79,6 @@ end
 %% Begin simulation
 
 fprintf('Starting simulation...\n');
-
-wb_h = waitbar(0, 'Simulation running...');
 
 % Main loop:
 tic
@@ -102,11 +99,6 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
         % Integrate the internal state with the calculated derivativess
         supervisor.integrate_fe();
 
-        % Update waitbar
-        if mod(frame_num, frame_skip)==0
-            waitbar(frame_num/num_frames, wb_h);
-        end
-
         % Update visual output
         if sim_options.visualization.draw_graphics
             draw_aircraft(supervisor.vehicle, false);
@@ -123,6 +115,9 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
 
     end
     
+    % Close the waitbar
+    supervisor.close_waitbar();
+    
     % Export simulation results
     if (sim_options.record_states)
         sim_output.array_time_states = supervisor.array_time_states;
@@ -137,7 +132,7 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
     if sim_options.delete_temp_vars
         clear array_inputs array_states vehicle_state_new temp_state ctrl_input
         clear vec_aerodynamics_force_body vec_aerodynamics_torque_body vec_force_body vec_torque_body vec_gravity_force_body vec_propulsion_force_body vec_propulsion_torque_body
-        clear num_frames frame_num frame_skip
+        clear num_frames frame_num
         clear t dt
     end
     
@@ -181,8 +176,6 @@ else
 end
 
 wall_time = toc;
-% Close waitbar
-close(wb_h);
 
 fprintf('Simulation ended\n\n');
 
@@ -196,6 +189,6 @@ warning(warn_state);
 % Clear internal variables
 if sim_options.delete_temp_vars
     clear supervisor temp_state
-    clear wall_time t_0 t_f num_frames frame_skip wb_h
+    clear wall_time t_0 t_f num_frames frame_skip
     clear warn_state
 end

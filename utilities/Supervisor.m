@@ -20,6 +20,7 @@ classdef Supervisor < handle
         controller; % Controller object
         
         t; % Simulation time
+        t_f; % Final time
         
         temp_state; % VehicleState object
         ctrl_input; % The control input vector
@@ -35,6 +36,9 @@ classdef Supervisor < handle
         solver_type;
         
         draw_graphics; % Live draw graphics flag
+        
+        waitbar_handle;
+        frame_skip=100; % Every how many frames the waitbar will update;
     end
     
     methods
@@ -103,6 +107,10 @@ classdef Supervisor < handle
             else
                 error('Unuspported solver type %d specified', sim_options.solver.solver_type);
             end
+            
+            % Initialize waitbar
+            obj.waitbar_handle = waitbar(0, 'Simulation running...');
+            obj.t_f = sim_options.solver.t_f;
             
             % Decide if live graphics are to be drawn
             obj.draw_graphics = sim_options.visualization.draw_graphics;
@@ -191,6 +199,15 @@ classdef Supervisor < handle
             obj.kinematics.set_state(obj.vehicle.state);
             % Perform the kinematics derivative calculation
             obj.kinematics.calc_state_derivatives(obj.vehicle);
+            
+            % Update waitbar
+            if obj.solver_type == 0
+                if mod(obj.indx_array_states, obj.frame_skip)==0
+                    waitbar(t/obj.t_f, obj.waitbar_handle);
+                end
+            elseif ismember(obj.solver_type, [1 2])
+                waitbar(t/obj.t_f, obj.waitbar_handle);
+            end
             
             % Record resulting inputs
             if obj.save_inputs
@@ -315,7 +332,10 @@ classdef Supervisor < handle
                 % ode initializatin, nothing to do here
                 
             elseif flag == 'done'
-                % ode ended, nothing to do here
+                % ode ended
+                
+                % Close the waitbar
+                obj.close_waitbar();
                 
             end
                 
@@ -419,6 +439,21 @@ classdef Supervisor < handle
             else
                 obj.array_inputs(:, index) = ctrl_input;
             end
+            
+        end
+        
+        function [] = close_waitbar(obj)
+            % CLOSE_WAITBAR Close the waitbar object
+            %
+            % Syntax:  [] = close_waitbar()
+            %
+            % Inputs:
+            %    (none)
+            %
+            % Outputs:
+            %    (none)
+            
+            close(obj.waitbar_handle);
             
         end
         
