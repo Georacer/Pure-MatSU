@@ -33,6 +33,8 @@ classdef Supervisor < handle
         array_time_inputs; % Time array, referring to control input evaluations
         
         solver_type;
+        
+        draw_graphics; % Live draw graphics flag
     end
     
     methods
@@ -102,6 +104,9 @@ classdef Supervisor < handle
                 error('Unuspported solver type %d specified', sim_options.solver.solver_type);
             end
             
+            % Decide if live graphics are to be drawn
+            obj.draw_graphics = sim_options.visualization.draw_graphics;
+            
         end
         
         function [] = initialize_sim_state(obj, sim_options)
@@ -117,6 +122,11 @@ classdef Supervisor < handle
             %    (none)
             
             obj.vehicle.state.initialize(sim_options);
+            
+            % Initialize visualization if needed
+            if obj.draw_graphics
+                draw_aircraft(obj.vehicle, true);
+            end
             
         end
         
@@ -289,8 +299,16 @@ classdef Supervisor < handle
             if isempty(flag)
                 % Normal ode step
                 
+                % Save control inputs
                 obj.store_time_inputs(obj.t); % Save time instance. Cannot pass t argument, because it may be vector
                 obj.store_inputs(obj.ctrl_input); % Save contorl vector
+                
+                % Draw live output
+                if obj.draw_graphics
+                    draw_aircraft(obj.vehicle, false);
+                    pause(0.001); % Allow some time for patches to render
+                end
+                
                 status = 0; % Continue solving
                 
             elseif flag=='init'

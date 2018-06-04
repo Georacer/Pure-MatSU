@@ -70,10 +70,6 @@ t_0 = sim_options.solver.t_0;
 t_f = sim_options.solver.t_f;
 frame_skip = 100;
 
-% Initialize visualization
-if sim_options.visualization.draw_graphics
-    draw_aircraft(vehicle, true);    
-end
 if sim_options.visualization.draw_forces
     plot_forces(gravity, propulsion, aerodynamics, 0, true);    
 end
