@@ -38,6 +38,8 @@ sim_options.solver.dt = 0.001; % (Not used if ode_solver!=0)
 sim_options.solver.t_0 = 0;
 % End time (s)
 sim_options.solver.t_f = 30;
+% Time accuracy
+sim_options.solver.t_eps = 1e-6; % in seconds
 
 % Select the differential equations solver method
 % Available options:

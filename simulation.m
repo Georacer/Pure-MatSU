@@ -98,7 +98,7 @@ if sim_options.solver.solver_type == 0 % Forward-Euler selected
     dt = sim_options.solver.dt;
     num_frames = (t_f-t_0)/dt;
     
-    while (t<t_f)
+    while (t_f - t > sim_options.solver.t_eps)
 
         % Calculate the state derivatives
         supervisor.sim_step(t);
