@@ -27,8 +27,6 @@ sim_options.vehicle = 'skywalker_2013';
 sim_options.record_states = true;
 % Save control inputs
 sim_options.record_inputs = true;
-% Clear all intermediate temporary workspace variables
-sim_options.delete_temp_vars = true;
 
 %% ODE solver options
 
