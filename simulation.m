@@ -143,7 +143,10 @@ elseif ismember(sim_options.solver.solver_type, [1 2]) % Matlab ode* requested
     y0 = supervisor.vehicle.state.serialize();
     % Set system function
     odefun = @supervisor.ode_eval;
-    options = odeset('outputFcn', @supervisor.ode_outputFcn);
+    options = odeset(...
+        'outputFcn', @supervisor.ode_outputFcn,...
+        'Refine', 1 ...
+        );
     
     if sim_options.solver.solver_type == 1 % If ode45 requested
         
