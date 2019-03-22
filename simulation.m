@@ -173,7 +173,6 @@ elseif ismember(sim_options.solver.solver_type, [1 2]) % Matlab ode* requested
         sim_output.array_states = y';
     end
     if (sim_options.record_inputs)
-        disp('haerea');
         warning('Exporting of control inputs not supported with Matlab''s ode solvers');
     end
     
