@@ -62,10 +62,10 @@ t_0 = sim_options.solver.t_0;
 t_f = sim_options.solver.t_f;
 
 if sim_options.visualization.draw_forces
-    plot_forces(gravity, propulsion, aerodynamics, 0, true);
+    plot_forces(supervisor.gravity, supervisor.propulsion, supervisor.aerodynamics, 0, true);
 end
 if sim_options.visualization.draw_states
-    plot_states(vehicle, 0, true);
+    plot_states(supervisor.vehicle, 0, true);
 end
 
 %% Begin simulation
