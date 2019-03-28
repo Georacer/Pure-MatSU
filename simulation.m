@@ -61,9 +61,11 @@ supervisor.initialize_controller(sim_options);
 t_0 = sim_options.solver.t_0;
 t_f = sim_options.solver.t_f;
 
+% Initialize forces plots
 if sim_options.visualization.draw_forces
     plot_forces(supervisor.gravity, supervisor.propulsion, supervisor.aerodynamics, 0, true);
 end
+% Initialize states plots
 if sim_options.visualization.draw_states
     plot_states(supervisor.vehicle, 0, true);
 end

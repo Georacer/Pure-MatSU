@@ -36,6 +36,8 @@ classdef Supervisor < handle
         solver_type;
         
         draw_graphics; % Live draw graphics flag
+        draw_forces; % Live draw forces flag
+        draw_states; % Live draw states flag
         
         waitbar_handle;
         frame_skip=100; % Every how many frames the waitbar will update;
@@ -112,8 +114,10 @@ classdef Supervisor < handle
             obj.waitbar_handle = waitbar(0, 'Simulation running...');
             obj.t_f = sim_options.solver.t_f;
             
-            % Decide if live graphics are to be drawn
+            % Decide if live graphics and plots are to be drawn
             obj.draw_graphics = sim_options.visualization.draw_graphics;
+            obj.draw_forces = sim_options.visualization.draw_forces;
+            obj.draw_states = sim_options.visualization.draw_states;
             
         end
         
@@ -134,6 +138,14 @@ classdef Supervisor < handle
             % Initialize visualization if needed
             if obj.draw_graphics
                 draw_aircraft(obj.vehicle, true);
+            end
+            % Initialize forces plots if needed
+            if obj.draw_forces
+                plot_forces(obj.gravity, obj.propulsion, obj.aerodynamics, 0, true);
+            end
+            % Initialize states plots if needed
+            if obj.draw_states
+                plot_states(obj.vehicle, 0, true);
             end
             
         end
@@ -326,6 +338,16 @@ classdef Supervisor < handle
                     pause(0.001); % Allow some time for patches to render
                 end
                 
+                % Draw live forces plots
+                if obj.draw_forces
+                    plot_forces(obj.gravity, obj.propulsion, obj.aerodynamics, t, false);
+                end
+                
+                % Draw live states plots
+                if obj.draw_states
+                    plot_states(obj.vehicle, t, false);
+                end
+                
                 status = 0; % Continue solving
                 
             elseif flag=='init'
@@ -390,7 +412,6 @@ classdef Supervisor < handle
             
         end
             
-        
         function [] = store_time_inputs(obj, t, index)
             % store_time_inputs Append a time to the time storage array, referring to control input evaluations
             % If called with only the first argument, will append the provided time to the end of the array. If the size
